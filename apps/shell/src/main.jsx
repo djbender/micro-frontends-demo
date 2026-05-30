@@ -59,7 +59,6 @@ function Shell() {
   const teardown = useCallback(() => {
     unmountsRef.current.forEach(fn => fn?.());
     unmountsRef.current = [];
-    document.querySelectorAll('[data-slot]').forEach(el => { el.innerHTML = ''; });
   }, []);
 
   const renderRoute = useCallback(async (r) => {
@@ -70,10 +69,12 @@ function Shell() {
     for (const mfe of mfes) {
       try {
         const mod = await loadRemote(`${mfe.name}/${mfe.module.replace('./', '')}`);
-        const target = document.querySelector(`[data-slot="${mfe.slot}"]`);
-        if (!target) continue;
-        const unmount = mod.mount(target, { bus });
-        unmountsRef.current.push(unmount);
+        const slot = document.querySelector(`[data-slot="${mfe.slot}"]`);
+        if (!slot) continue;
+        const wrapper = document.createElement('div');
+        slot.appendChild(wrapper);
+        const unmount = mod.mount(wrapper, { bus });
+        unmountsRef.current.push(() => { unmount?.(); wrapper.remove(); });
       } catch (e) {
         console.error(`Failed to load ${mfe.name}:`, e);
       }
