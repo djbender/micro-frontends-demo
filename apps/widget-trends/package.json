@@ -1,0 +1,19 @@
+{
+  "name": "widget-trends",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 5003"
+  },
+  "dependencies": {
+    "@demo/contracts": "workspace:*",
+    "svelte": "^5"
+  },
+  "devDependencies": {
+    "@module-federation/vite": "^1.16",
+    "@sveltejs/vite-plugin-svelte": "^7",
+    "vite": "^8"
+  }
+}

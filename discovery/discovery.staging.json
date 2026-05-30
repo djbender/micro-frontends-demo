@@ -1,0 +1,41 @@
+{
+  "schemaVersion": "1",
+  "mfes": [
+    {
+      "name": "widget-filter",
+      "url": "https://cdn.example.com/widget-filter/remoteEntry.js",
+      "module": "./mount",
+      "slot": "toolbar",
+      "route": "/overview",
+      "requiredPermissions": ["dashboard.view"],
+      "version": "1.0.0"
+    },
+    {
+      "name": "widget-kpi",
+      "url": "https://cdn.example.com/widget-kpi/remoteEntry.js",
+      "module": "./mount",
+      "slot": "main",
+      "route": "/overview",
+      "requiredPermissions": ["dashboard.view"],
+      "version": "1.0.0"
+    },
+    {
+      "name": "widget-trends",
+      "url": "https://cdn.example.com/widget-trends/remoteEntry.js",
+      "module": "./mount",
+      "slot": "side",
+      "route": "/overview",
+      "requiredPermissions": ["dashboard.view"],
+      "version": "1.0.0"
+    },
+    {
+      "name": "widget-admin",
+      "url": "https://cdn.example.com/widget-admin/remoteEntry.js",
+      "module": "./mount",
+      "slot": "main",
+      "route": "/admin",
+      "requiredPermissions": ["dashboard.admin"],
+      "version": "1.0.0"
+    }
+  ]
+}

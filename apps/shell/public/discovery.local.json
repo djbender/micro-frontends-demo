@@ -1,0 +1,41 @@
+{
+  "schemaVersion": "1",
+  "mfes": [
+    {
+      "name": "widget-filter",
+      "url": "http://localhost:5004/remoteEntry.js",
+      "module": "./mount",
+      "slot": "toolbar",
+      "route": "/overview",
+      "requiredPermissions": ["dashboard.view"],
+      "version": "1.0.0"
+    },
+    {
+      "name": "widget-kpi",
+      "url": "http://localhost:5001/remoteEntry.js",
+      "module": "./mount",
+      "slot": "main",
+      "route": "/overview",
+      "requiredPermissions": ["dashboard.view"],
+      "version": "1.0.0"
+    },
+    {
+      "name": "widget-trends",
+      "url": "http://localhost:5003/remoteEntry.js",
+      "module": "./mount",
+      "slot": "side",
+      "route": "/overview",
+      "requiredPermissions": ["dashboard.view"],
+      "version": "1.0.0"
+    },
+    {
+      "name": "widget-admin",
+      "url": "http://localhost:5005/remoteEntry.js",
+      "module": "./mount",
+      "slot": "main",
+      "route": "/admin",
+      "requiredPermissions": ["dashboard.admin"],
+      "version": "1.0.0"
+    }
+  ]
+}

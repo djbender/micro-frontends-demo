@@ -1,0 +1,17 @@
+{
+  "name": "widget-filter",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 5004"
+  },
+  "dependencies": {
+    "@demo/contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@module-federation/vite": "^1.16",
+    "vite": "^8"
+  }
+}
