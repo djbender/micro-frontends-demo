@@ -5,13 +5,18 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview --port 5004"
+    "preview": "vite preview --port 5004",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@demo/contracts": "workspace:*"
   },
   "devDependencies": {
     "@module-federation/vite": "^1.16",
-    "vite": "^8"
+    "@testing-library/jest-dom": "^6.9.1",
+    "happy-dom": "^20.9.0",
+    "vite": "^8",
+    "vitest": "^4.1.7"
   }
 }

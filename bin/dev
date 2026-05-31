@@ -1,0 +1,15 @@
+#!/usr/bin/env node
+import concurrently from 'concurrently'
+
+const { result } = concurrently(
+  [
+    { command: 'pnpm --filter shell dev',         name: 'shell'  },
+    { command: 'pnpm --filter widget-kpi dev',    name: 'kpi'    },
+    { command: 'pnpm --filter widget-trends dev', name: 'trends' },
+    { command: 'pnpm --filter widget-filter dev', name: 'filter' },
+    { command: 'pnpm --filter widget-admin dev',  name: 'admin'  },
+  ],
+  { killOthers: ['failure'] }
+)
+
+result.then(() => process.exit(0), () => process.exit(1))

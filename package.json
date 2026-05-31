@@ -6,12 +6,22 @@
     "node": "26.2.0"
   },
   "scripts": {
-    "dev": "pnpm -r --parallel run dev",
+    "dev": "node bin/dev",
     "build": "pnpm -r run build",
-    "preview": "pnpm -r --parallel run preview"
+    "preview": "pnpm -r --parallel run preview",
+    "test": "pnpm -r run test",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "pnpm -r run build && playwright test",
+    "test:all": "pnpm test && pnpm test:e2e",
+    "lint": "oxlint ."
   },
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "devDependencies": {
+    "@playwright/test": "^1.60.0",
+    "@vitest/coverage-v8": "^4.1.7",
+    "concurrently": "^10.0.0"
+  }
 }
