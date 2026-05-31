@@ -124,6 +124,7 @@ class FilterWidget extends HTMLElement {
   }
 }
 
+/* v8 ignore next 3 */
 if (!customElements.get('filter-widget')) {
   customElements.define('filter-widget', FilterWidget);
 }

@@ -1,4 +1,5 @@
 import { render, screen, act } from '@testing-library/react';
+import * as dataModule from './data.js';
 import KpiWidget from './KpiWidget.jsx';
 
 function makeBus() {
@@ -52,6 +53,16 @@ describe('KpiWidget', () => {
     render(<KpiWidget bus={bus} />);
     const ups = screen.getAllByText(/▲/);
     expect(ups.length).toBe(4);
+  });
+
+  it('shows negative change indicator (▼) when computeKpis returns negative change', () => {
+    vi.spyOn(dataModule, 'computeKpis').mockReturnValue([
+      { key: 'revenue', label: 'Revenue', unit: '$', value: 400000, change: -5.2 },
+    ]);
+    const bus = makeBus();
+    render(<KpiWidget bus={bus} />);
+    expect(screen.getByText(/▼/)).toBeInTheDocument();
+    vi.restoreAllMocks();
   });
 
   it('removes FILTER_CHANGE listener on unmount', () => {

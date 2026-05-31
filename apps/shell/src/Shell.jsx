@@ -14,7 +14,6 @@ export default function Shell({ currentUser = { permissions: ['dashboard.view'] 
   const busRef = useRef(new EventTarget());
   const byRouteRef = useRef({});
   const unmountsRef = useRef([]);
-  const initializedRef = useRef(false);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -44,7 +43,6 @@ export default function Shell({ currentUser = { permissions: ['dashboard.view'] 
         remotes: allowed.map(m => ({ name: m.name, entry: m.url, type: 'module' })),
       });
 
-      initializedRef.current = true;
       byRouteRef.current = Object.groupBy(allowed, m => m.route);
       setNavRoutes(Object.keys(byRouteRef.current));
       setStatus('ready');
@@ -58,7 +56,6 @@ export default function Shell({ currentUser = { permissions: ['dashboard.view'] 
   }, []);
 
   const renderRoute = useCallback(async (r) => {
-    if (!initializedRef.current) return;
     teardown();
     const mfes = byRouteRef.current[r] ?? [];
     const bus = busRef.current;
