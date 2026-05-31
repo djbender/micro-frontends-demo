@@ -39,6 +39,19 @@ describe('TrendsWidget', () => {
     expect(screen.getByText('Enterprise · 7d')).toBeInTheDocument();
   });
 
+  it('updates footer dateRange when FILTER_CHANGE fires 7d/all', async () => {
+    const bus = makeBus();
+    render(TrendsWidget, { props: { bus } });
+
+    await new Promise(r => setTimeout(r, 0));
+    bus.dispatchEvent(new CustomEvent('dashboard:filter-change', {
+      detail: { dateRange: '7d', segment: 'all' },
+    }));
+    await new Promise(r => setTimeout(r, 0));
+
+    expect(screen.getByText('All segments · 7d')).toBeInTheDocument();
+  });
+
   it('renders an SVG chart', () => {
     const bus = makeBus();
     render(TrendsWidget, { props: { bus } });

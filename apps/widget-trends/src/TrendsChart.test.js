@@ -12,6 +12,11 @@ describe('TrendsChart', () => {
     expect(document.querySelector('svg[aria-label="Trends chart"]')).toBeInTheDocument();
   });
 
+  it('renders "No data" when called with no data prop (default [])', () => {
+    render(TrendsChart, { props: {} });
+    expect(screen.getByText('No data')).toBeInTheDocument();
+  });
+
   it('renders a single circle for one data point (no line path)', () => {
     render(TrendsChart, { props: { data: [{ i: 0, value: 1000 }] } });
     const circles = document.querySelectorAll('circle');
