@@ -26,6 +26,22 @@ describe('TrendsWidget', () => {
     expect(screen.getByText('All segments · 30d')).toBeInTheDocument();
   });
 
+  it('dispatches dashboard:event-consumed ack when FILTER_CHANGE fires', async () => {
+    const bus = makeBus();
+    render(TrendsWidget, { props: { bus } });
+
+    const spy = vi.spyOn(bus, 'dispatchEvent');
+    await new Promise(r => setTimeout(r, 0));
+    bus.dispatchEvent(new CustomEvent('dashboard:filter-change', {
+      detail: { dateRange: '7d', segment: 'all' },
+    }));
+    await new Promise(r => setTimeout(r, 0));
+
+    const ack = spy.mock.calls.map(([e]) => e).find(e => e.type === 'dashboard:event-consumed');
+    expect(ack).toBeDefined();
+    expect(ack.detail).toEqual({ actor: 'widget-trends', topic: 'dashboard:filter-change', payload: { dateRange: '7d', segment: 'all' } });
+  });
+
   it('updates footer when FILTER_CHANGE fires with enterprise/7d', async () => {
     const bus = makeBus();
     render(TrendsWidget, { props: { bus } });

@@ -7,7 +7,12 @@ export default function KpiWidget({ bus }) {
   const [filter, setFilter] = useState({ dateRange: '30d', segment: 'all' });
 
   useEffect(() => {
-    const onFilter = (e) => setFilter(e.detail);
+    const onFilter = (e) => {
+      setFilter(e.detail);
+      bus.dispatchEvent(new CustomEvent(TOPICS.EVENT_CONSUMED, {
+        detail: { actor: 'widget-kpi', topic: TOPICS.FILTER_CHANGE, payload: e.detail },
+      }));
+    };
     bus.addEventListener(TOPICS.FILTER_CHANGE, onFilter);
     bus.dispatchEvent(new CustomEvent(TOPICS.REQUEST_FILTER, { bubbles: false }));
     return () => bus.removeEventListener(TOPICS.FILTER_CHANGE, onFilter);

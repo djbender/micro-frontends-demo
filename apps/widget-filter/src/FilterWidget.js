@@ -6,10 +6,13 @@ const SEGMENTS = ['all', 'enterprise', 'smb', 'consumer'];
 const STYLES = `
   :host {
     display: block;
+    width: 100%;
+  }
+  .widget {
     background: var(--color-surface, #fff);
     border: 1px solid var(--color-border, #e2e8f0);
     border-radius: var(--radius, 8px);
-    padding: 12px 16px;
+    padding: 16px;
     box-shadow: var(--shadow, 0 1px 3px rgba(0,0,0,0.1));
   }
   .filter-bar {
@@ -24,6 +27,18 @@ const STYLES = `
     color: var(--color-text-muted, #718096);
     text-transform: uppercase;
     letter-spacing: 0.05em;
+  }
+  .filter-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .filter-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text, #1a202c);
+    margin: 0;
   }
   .btn-group { display: flex; gap: 4px; }
   button {
@@ -96,16 +111,21 @@ class FilterWidget extends HTMLElement {
   #render() {
     this.#shadow.innerHTML = `
       <style>${STYLES}</style>
-      <div class="filter-bar">
-        <span class="filter-label">Date Range</span>
-        <div class="btn-group">
-          ${RANGES.map(r => `<button data-range="${r}" class="${r === this.#dateRange ? 'active' : ''}">${r}</button>`).join('')}
+      <div class="widget">
+        <div class="filter-header">
+          <h2 class="filter-title">Filters</h2>
+          <span class="version-badge">v${__WIDGET_VERSION__}</span>
         </div>
-        <span class="filter-label">Segment</span>
-        <select id="segment">
-          ${SEGMENTS.map(s => `<option value="${s}" ${s === this.#segment ? 'selected' : ''}>${s.charAt(0).toUpperCase() + s.slice(1)}</option>`).join('')}
-        </select>
-        <span class="version-badge">v${__WIDGET_VERSION__}</span>
+        <div class="filter-bar">
+          <span class="filter-label">Date Range</span>
+          <div class="btn-group">
+            ${RANGES.map(r => `<button data-range="${r}" class="${r === this.#dateRange ? 'active' : ''}">${r}</button>`).join('')}
+          </div>
+          <span class="filter-label">Segment</span>
+          <select id="segment">
+            ${SEGMENTS.map(s => `<option value="${s}" ${s === this.#segment ? 'selected' : ''}>${s.charAt(0).toUpperCase() + s.slice(1)}</option>`).join('')}
+          </select>
+        </div>
       </div>
     `;
 

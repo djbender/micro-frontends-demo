@@ -11,6 +11,9 @@
 
   function onFilterChange(e) {
     filter = e.detail;
+    bus.dispatchEvent(new CustomEvent(TOPICS.EVENT_CONSUMED, {
+      detail: { actor: 'widget-trends', topic: TOPICS.FILTER_CHANGE, payload: e.detail },
+    }));
   }
 
   onMount(() => {

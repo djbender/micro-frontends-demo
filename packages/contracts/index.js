@@ -1,10 +1,12 @@
 export const TOPICS = {
   FILTER_CHANGE: 'dashboard:filter-change',
   REQUEST_FILTER: 'dashboard:request-filter',
+  EVENT_CONSUMED: 'dashboard:event-consumed',
 };
 
 /**
  * @typedef {{ dateRange: string, segment: string }} FilterDetail
+ * @typedef {{ actor: string, topic: string, payload: FilterDetail }} ConsumedDetail
  * @typedef {{ name: string, url: string, module: string, slot: string, route: string, requiredPermissions: string[], version: string }} ManifestEntry
  * @typedef {{ schemaVersion: string, mfes: ManifestEntry[] }} Manifest
  */

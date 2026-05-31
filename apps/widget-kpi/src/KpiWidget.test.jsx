@@ -48,6 +48,22 @@ describe('KpiWidget', () => {
     expect(screen.getByText('$120.5k')).toBeInTheDocument();
   });
 
+  it('dispatches dashboard:event-consumed ack when FILTER_CHANGE fires', async () => {
+    const bus = makeBus();
+    render(<KpiWidget bus={bus} />);
+
+    const spy = vi.spyOn(bus, 'dispatchEvent');
+    await act(async () => {
+      bus.dispatchEvent(new CustomEvent('dashboard:filter-change', {
+        detail: { dateRange: '7d', segment: 'all' },
+      }));
+    });
+
+    const ack = spy.mock.calls.map(([e]) => e).find(e => e.type === 'dashboard:event-consumed');
+    expect(ack).toBeDefined();
+    expect(ack.detail).toEqual({ actor: 'widget-kpi', topic: 'dashboard:filter-change', payload: { dateRange: '7d', segment: 'all' } });
+  });
+
   it('shows positive change indicator (▲) for all KPIs', () => {
     const bus = makeBus();
     render(<KpiWidget bus={bus} />);

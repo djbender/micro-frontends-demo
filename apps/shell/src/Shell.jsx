@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { init, loadRemote } from '@module-federation/runtime';
 import { validateManifest } from '@demo/contracts';
+import EventLog from './EventLog.jsx';
 
 const DISCOVERY_URL = import.meta.env.VITE_DISCOVERY_URL ?? '/discovery.local.json';
 
@@ -109,6 +110,7 @@ export default function Shell({ currentUser = { permissions: ['dashboard.view'] 
         <div className="slot-main" data-slot="main"></div>
         <div className="slot-side" data-slot="side"></div>
       </main>
+      <EventLog bus={busRef.current} />
       <footer className="mfe-explainer">
         <details className="mfe-explainer__details">
         <summary className="mfe-explainer__summary">

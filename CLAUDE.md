@@ -50,10 +50,11 @@ Every widget exposes `./mount` with the same signature: `mount(target, props) �
 
 ### Cross-widget communication
 
-Via `EventTarget` bus — no global store, no shared package. Two events defined in `packages/contracts/index.js`:
+Via `EventTarget` bus — no global store, no shared package. Three events defined in `packages/contracts/index.js`:
 
 - `dashboard:filter-change` — emitted by `widget-filter` with `{ dateRange, segment }` detail
 - `dashboard:request-filter` — emitted by consumers on mount; `widget-filter` re-emits current state in response (late-mount handshake, no state cached on the bus)
+- `dashboard:event-consumed` — dispatched by each consumer (`widget-kpi`, `widget-trends`) after handling `filter-change`; detail shape `{ actor: string, topic: string }`. The shell renders a live **EventLog** panel as another bus consumer, making the one-emit → N-consumers fan-out visible in real time.
 
 Widgets MAY import `TOPICS` from `@demo/contracts` or use string literals.
 
