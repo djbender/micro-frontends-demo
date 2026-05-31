@@ -46,7 +46,7 @@ Every widget exposes `./mount` with the same signature: `mount(target, props) �
 | `widget-kpi` | React 19 | 5001 | `createRoot(target).render(...)` |
 | `widget-trends` | Svelte 5 | 5003 | `svelteMount(Component, { target, props })` |
 | `widget-filter` | Web Component | 5004 | `customElements.define` guard + `el.bus = props.bus` |
-| `widget-admin` | React 19 | 5005 | `createRoot(target).render(...)` |
+| `widget-admin` | React 19 | 5005 | `createRoot(target).render(...)` (does not use `props.bus`) |
 
 ### Cross-widget communication
 
@@ -63,7 +63,7 @@ Widgets MAY import `TOPICS` from `@demo/contracts` or use string literals.
 
 ### Permission gating
 
-`currentUser` is mocked in `apps/shell/src/main.jsx:9`. Default has `['dashboard.view']` — grants `/overview` widgets, hides `/admin`. Add `'dashboard.admin'` to the array to expose the admin widget; no code change elsewhere needed.
+`currentUser` is mocked in `apps/shell/src/main.jsx` (line 10). Default has `['dashboard.view']` — grants `/overview` widgets, hides `/admin`. Supports `?permissions=dashboard.view,dashboard.admin` URL parameter for testing without editing code. Add `'dashboard.admin'` to the array to expose the admin widget; no code change elsewhere needed.
 
 ### Design tokens
 

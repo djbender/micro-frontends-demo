@@ -60,13 +60,13 @@ The shell fetches `discovery.local.json` at runtime, filters by permission, then
 By default, `currentUser` in `apps/shell/src/main.jsx` has only `dashboard.view`. The admin widget requires `dashboard.admin`, so the nav and route are absent.
 
 To unlock admin:
-1. Open `apps/shell/src/main.jsx`
-2. Change line 9 to:
-   ```js
-   const currentUser = { permissions: ['dashboard.view', 'dashboard.admin'] };
-   ```
-3. Save — Vite HMR reloads the shell automatically.
-4. The admin nav button appears; click it to see the gated panel.
+- **URL parameter** (no code change): open `http://localhost:5000?permissions=dashboard.view,dashboard.admin`
+- **Edit the source**: change the default in `apps/shell/src/main.jsx` to:
+    ```js
+    const currentUser = { permissions: ['dashboard.view', 'dashboard.admin'] };
+    ```
+    Save — Vite HMR reloads the shell automatically.
+- The admin nav button appears; click it to see the gated panel.
 
 No rebuild. No widget change. Only the shell's mock user object changed.
 
