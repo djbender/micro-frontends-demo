@@ -7,11 +7,11 @@
   },
   "scripts": {
     "dev": "node bin/dev",
-    "build": "pnpm -r run build",
+    "build": "pnpm -r --parallel run build",
     "preview": "pnpm -r --parallel run preview",
-    "test": "pnpm -r run test",
+    "test": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "test:e2e": "pnpm -r run build && playwright test",
+    "test:e2e": "pnpm -r --parallel run build && playwright test",
     "test:all": "pnpm test && pnpm test:e2e",
     "lint": "oxlint ."
   },
@@ -20,7 +20,7 @@
     "packages/*"
   ],
   "devDependencies": {
-    "@playwright/test": "^1.60.0",
+    "@playwright/test": "file:../playwright/packages/playwright-test",
     "@vitest/coverage-v8": "^4.1.7",
     "concurrently": "^10.0.0",
     "vitest": "^4.1.7"
