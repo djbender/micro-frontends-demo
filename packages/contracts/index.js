@@ -11,7 +11,7 @@ export const TOPICS = {
  *   url: string,
  *   fallbackUrl?: string,
  *   metadata: { integrity: string, version: string },
- *   deployment?: { default?: boolean, traffic?: number },
+ *   deployment: { default: boolean, traffic: number },
  *   extras: { module: string, slot: string, route: string, requiredPermissions: string[] }
  * }} ManifestEntry
  * @typedef {{ schema: string, microFrontends: Record<string, ManifestEntry[]> }} Manifest
@@ -44,6 +44,15 @@ export function validateManifest(json) {
         return { valid: false, error: `Entry in "${name}" missing extras.route` };
       if (!Array.isArray(entry.extras?.requiredPermissions))
         return { valid: false, error: `Entry in "${name}" missing extras.requiredPermissions array` };
+      if (typeof entry.deployment?.traffic !== 'number')
+        return { valid: false, error: `Entry in "${name}" missing deployment.traffic` };
+      if (typeof entry.deployment?.default !== 'boolean')
+        return { valid: false, error: `Entry in "${name}" missing deployment.default` };
+    }
+    if (versions.length > 1) {
+      const total = versions.reduce((sum, v) => sum + v.deployment.traffic, 0);
+      if (total !== 100)
+        return { valid: false, error: `microFrontends["${name}"] traffic percentages must sum to 100 (got ${total})` };
     }
   }
   return { valid: true };

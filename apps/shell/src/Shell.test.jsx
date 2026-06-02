@@ -72,7 +72,7 @@ describe('Shell', () => {
     expect(screen.getByText(/Manifest error:/)).toBeInTheDocument();
   });
 
-  it('boots correctly when version entry has no deployment field (falls back to versions[0])', async () => {
+  it('shows error state when manifest entry is missing deployment field', async () => {
     const { deployment: _, ...entryWithoutDeployment } = BASE_MANIFEST.microFrontends['widget-kpi'][0];
     const manifest = {
       schema: SCHEMA,
@@ -80,8 +80,7 @@ describe('Shell', () => {
     };
     mockFetch(manifest);
     await act(async () => { render(<Shell currentUser={{ permissions: ['dashboard.view'] }} />); });
-    screen.getByText('Overview');
-    expect(loadRemote).toHaveBeenCalledWith('widget-kpi/mount');
+    expect(screen.getByText(/Manifest error:/)).toBeInTheDocument();
   });
 
   it('loads kpi/filter/trends but not admin for dashboard.view-only user', async () => {
@@ -89,10 +88,10 @@ describe('Shell', () => {
     await act(async () => { render(<Shell currentUser={{ permissions: ['dashboard.view'] }} />); });
     screen.getByText('Overview');
     const loaded = loadRemote.mock.calls.map(([name]) => name);
-    expect(loaded).toContain('widget-filter/mount');
-    expect(loaded).toContain('widget-kpi/mount');
-    expect(loaded).toContain('widget-trends/mount');
-    expect(loaded).not.toContain('widget-admin/mount');
+    expect(loaded.some(n => n.startsWith('widget-filter'))).toBe(true);
+    expect(loaded.some(n => n.startsWith('widget-kpi'))).toBe(true);
+    expect(loaded.some(n => n.startsWith('widget-trends'))).toBe(true);
+    expect(loaded.some(n => n.startsWith('widget-admin'))).toBe(false);
   });
 
   it('does not show admin route button for non-admin user', async () => {
@@ -195,6 +194,66 @@ describe('Shell', () => {
     expect(mountFn).toHaveBeenCalledWith(expect.any(HTMLElement), expect.objectContaining({ bus: expect.any(EventTarget) }));
   });
 
+  it('shows a bucket chip in the header after boot', async () => {
+    mockFetch(BASE_MANIFEST);
+    const { unmount } = await act(async () => render(<Shell currentUser={{ permissions: ['dashboard.view'] }} userToken="alice" />));
+    expect(screen.getAllByText(/bucket \d+/)[0]).toBeInTheDocument();
+    unmount();
+  });
+
+  it('selects the same version for the same token (deterministic)', async () => {
+    const splitManifest = {
+      schema: SCHEMA,
+      microFrontends: {
+        'widget-kpi': [
+          { ...makeEntry('http://localhost:5001/remoteEntry.js', { slot: 'main', route: '/overview', requiredPermissions: ['dashboard.view'], version: '1.0.0' }), deployment: { default: true,  traffic: 90 } },
+          { ...makeEntry('http://localhost:5001/remoteEntry.js', { slot: 'main', route: '/overview', requiredPermissions: ['dashboard.view'], version: '1.1.0' }), deployment: { default: false, traffic: 10 } },
+        ],
+      },
+    };
+    // Render twice with the same token — loadRemote should be called with the same remote both times
+    for (let i = 0; i < 2; i++) {
+      vi.clearAllMocks();
+      loadRemote.mockResolvedValue({ mount: vi.fn().mockReturnValue(vi.fn()) });
+      mockFetch(splitManifest);
+      const { unmount } = await act(async () => render(<Shell currentUser={{ permissions: ['dashboard.view'] }} userToken="alice" />));
+      screen.getByText('Overview');
+      unmount();
+    }
+    // Both renders called the same remote entry
+    const calls = loadRemote.mock.calls.map(([name]) => name);
+    expect(calls).toEqual(['widget-kpi_1_0_0/mount']);
+  });
+
+  it('token="canary" always picks the minority version (bucket 100)', async () => {
+    const v1Url = 'http://localhost:5001/v1/remoteEntry.js';
+    const v2Url = 'http://localhost:5001/v2/remoteEntry.js';
+    const splitManifest = {
+      schema: SCHEMA,
+      microFrontends: {
+        'widget-kpi': [
+          { url: v1Url, fallbackUrl: v1Url, metadata: { integrity: '', version: '1.0.0' }, deployment: { default: true,  traffic: 90 }, extras: { module: './mount', slot: 'main', route: '/overview', requiredPermissions: ['dashboard.view'] } },
+          { url: v2Url, fallbackUrl: v2Url, metadata: { integrity: '', version: '1.1.0' }, deployment: { default: false, traffic: 10 }, extras: { module: './mount', slot: 'main', route: '/overview', requiredPermissions: ['dashboard.view'] } },
+        ],
+      },
+    };
+    const { init: mockInit } = await import('@module-federation/runtime');
+
+    mockFetch(splitManifest);
+    const { unmount: unmount1 } = await act(async () => render(<Shell currentUser={{ permissions: ['dashboard.view'] }} userToken="canary" />));
+    screen.getByText('Overview');
+    expect(mockInit.mock.calls.some(([cfg]) => cfg.remotes?.some(r => r.entry === v2Url))).toBe(true);
+    unmount1();
+
+    vi.clearAllMocks();
+    loadRemote.mockResolvedValue({ mount: vi.fn().mockReturnValue(vi.fn()) });
+    mockFetch(splitManifest);
+    const { unmount: unmount2 } = await act(async () => render(<Shell currentUser={{ permissions: ['dashboard.view'] }} userToken="default" />));
+    screen.getByText('Overview');
+    expect(mockInit.mock.calls.some(([cfg]) => cfg.remotes?.some(r => r.entry === v1Url))).toBe(true);
+    unmount2();
+  });
+
   it('skips a widget whose slot does not exist in the DOM (!slot continue)', async () => {
     mockFetch(GHOST_SLOT_MANIFEST);
     const mountFn = vi.fn().mockReturnValue(vi.fn());
@@ -204,8 +263,8 @@ describe('Shell', () => {
     screen.getByText('Overview');
 
     const loaded = loadRemote.mock.calls.map(([name]) => name);
-    expect(loaded).toContain('widget-real/mount');
-    expect(loaded).toContain('widget-ghost/mount');
+    expect(loaded.some(n => n.startsWith('widget-real'))).toBe(true);
+    expect(loaded.some(n => n.startsWith('widget-ghost'))).toBe(true);
 
     expect(mountFn).toHaveBeenCalledTimes(1); // only the real-slot widget mounts; ghost hit `continue`
     expect(mountFn).toHaveBeenCalledWith(

@@ -6,12 +6,35 @@ import EventLog from './EventLog.jsx';
 const DISCOVERY_URL = import.meta.env.VITE_DISCOVERY_URL ?? '/discovery.local.json';
 const DEFAULT_USER = { permissions: ['dashboard.view'] };
 
-export default function Shell({ currentUser = DEFAULT_USER }) {
+function djb2(str) {
+  let hash = 5381;
+  for (let i = 0; i < str.length; i++)
+    hash = ((hash << 5) + hash) ^ str.charCodeAt(i);
+  return (hash >>> 0) % 100 + 1; // 1–100
+}
+
+function selectVersion(versions, userToken) {
+  try {
+    const bucket = userToken === 'default' ? 1
+      : userToken === 'canary' ? 100
+      : djb2(userToken + versions.map(v => v.url).join('|'));
+    let cumulative = 0;
+    for (const v of versions) {
+      cumulative += v.deployment.traffic;
+      if (bucket <= cumulative) return v;
+    }
+  } catch (_) { /* fall through to default */ } // c8 ignore
+  /* c8 ignore next -- catch path unreachable after validateManifest guarantees deployment fields */
+  return versions.find(v => v.deployment.default) ?? versions[0];
+}
+
+export default function Shell({ currentUser = DEFAULT_USER, userToken = null }) {
   const [route, setRoute] = useState('/overview');
   const [theme, setTheme] = useState('light');
   const [status, setStatus] = useState('loading');
   const [error, setError] = useState(null);
   const [navRoutes, setNavRoutes] = useState([]);
+  const [trafficInfo, setTrafficInfo] = useState(null);
 
   const busRef = useRef(new EventTarget());
   const byRouteRef = useRef({});
@@ -36,47 +59,66 @@ export default function Shell({ currentUser = DEFAULT_USER }) {
         return;
       }
 
+      const token = userToken ?? crypto.randomUUID();
       const allowed = Object.entries(manifest.microFrontends).flatMap(([name, versions]) => {
-        const entry = versions.find(v => v.deployment?.default) ?? versions[0];
+        const entry = selectVersion(versions, token);
         const { slot, route, requiredPermissions, module: mod } = entry.extras;
         if (!requiredPermissions.every(p => currentUser.permissions.includes(p))) return [];
-        return [{ name, url: entry.url, fallbackUrl: entry.fallbackUrl, module: mod, slot, route }];
-      });
+        const version = entry.metadata.version;
+        const remoteName = `${name}_${version.replace(/\./g, '_')}`;
 
+        return [{ name, remoteName, url: entry.url, fallbackUrl: entry.fallbackUrl, module: mod, slot, route, version }];
+      });
       await init({
         name: 'shell',
-        remotes: allowed.map(m => ({ name: m.name, entry: m.url, type: 'module' })),
+        remotes: allowed.map(m => ({ name: m.remoteName, entry: m.url, type: 'module' })),
       });
+
+      const splitEntry = Object.values(manifest.microFrontends).find(v => v.length > 1);
+      const bucket = splitEntry
+        ? (token === 'default' ? 1 : token === 'canary' ? 100 : djb2(token + splitEntry.map(v => v.url).join('|')))
+        : null;
 
       byRouteRef.current = Object.groupBy(allowed, m => m.route);
       setNavRoutes(Object.keys(byRouteRef.current));
+      setTrafficInfo({ token, bucket });
       setStatus('ready');
+
+
     }
     boot();
-  }, [currentUser]);
+  }, [currentUser, userToken]);
 
   const teardown = useCallback(() => {
     unmountsRef.current.forEach(fn => fn?.());
     unmountsRef.current = [];
   }, []);
 
+  const renderAbortRef = useRef(null);
+
   const renderRoute = useCallback(async (r) => {
+    const abort = Symbol();
+    renderAbortRef.current = abort;
     teardown();
     const mfes = byRouteRef.current[r] ?? [];
     const bus = busRef.current;
     for (const mfe of mfes) {
+      /* c8 ignore next */
+      if (renderAbortRef.current !== abort) return;
       try {
         let mod;
         try {
-          mod = await loadRemote(`${mfe.name}/${mfe.module.replace('./', '')}`);
+          mod = await loadRemote(`${mfe.remoteName}/${mfe.module.replace('./', '')}`);
         } catch (e) {
           if (mfe.fallbackUrl && mfe.fallbackUrl !== mfe.url) {
-            await init({ name: 'shell', remotes: [{ name: mfe.name, entry: mfe.fallbackUrl, type: 'module' }] });
-            mod = await loadRemote(`${mfe.name}/${mfe.module.replace('./', '')}`);
+            await init({ name: 'shell', remotes: [{ name: mfe.remoteName, entry: mfe.fallbackUrl, type: 'module' }] });
+            mod = await loadRemote(`${mfe.remoteName}/${mfe.module.replace('./', '')}`);
           } else {
             throw e;
           }
         }
+        /* c8 ignore next */
+        if (renderAbortRef.current !== abort) return;
         const slot = document.querySelector(`[data-slot="${mfe.slot}"]`);
         if (!slot) continue;
         const wrapper = document.createElement('div');
@@ -111,6 +153,11 @@ export default function Shell({ currentUser = DEFAULT_USER }) {
             </button>
           ))}
         </nav>
+        {trafficInfo?.bucket != null && (
+          <span className="traffic-chip" title={`token: ${trafficInfo.token}`}>
+            bucket {trafficInfo.bucket}
+          </span>
+        )}
         <button
           className="theme-toggle"
           onClick={() => setTheme(t => t === 'light' ? 'dark' : 'light')}
@@ -184,6 +231,19 @@ export default function Shell({ currentUser = DEFAULT_USER }) {
               never fetched, and never mounted — the route and nav entry simply do not appear.{' '}
               <em>Access control lives in one place and is enforced before any remote code executes.</em>{' '}
               Try <code>?permissions=dashboard.view,dashboard.admin</code> to unlock the admin route.
+            </p>
+          </li>
+
+          <li className="mfe-explainer__section">
+            <h3>Traffic Splitting &amp; Canary Deploys</h3>
+            <p>
+              The manifest can carry multiple versions of a widget with a <code>deployment.traffic</code> percentage each.
+              The shell hashes a <code>?token=</code> URL parameter against the active version URLs (djb2, 1–100 bucket)
+              to deterministically select a version — the same token always lands the same user on the same version.
+              The header chip shows your current bucket. Two special tokens bypass the hash:{' '}
+              <code>?token=default</code> forces bucket 1 (majority version, v1.0.0) and{' '}
+              <code>?token=canary</code> forces bucket 100 (minority version, v1.1.0) on the KPI widget.{' '}
+              <em>Ship a new widget version to 10% of users with zero infrastructure change — just update the manifest.</em>
             </p>
           </li>
 

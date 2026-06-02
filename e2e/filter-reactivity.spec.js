@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 async function waitForShell(page) {
   await page.goto('/');
-  await expect(page.locator('[data-slot="main"]').getByText('KPI Summary')).toBeVisible({ timeout: 15000 });
+  await expect(page.locator('[data-slot="main"]').getByText('KPI Summary')).toBeVisible();
 }
 
 test.describe('filter reactivity', () => {
@@ -19,7 +19,7 @@ test.describe('filter reactivity', () => {
       el.shadowRoot.querySelector('[data-range="7d"]').click();
     });
 
-    await expect(page.locator('[data-slot="main"]').getByText('$120.5k')).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('[data-slot="main"]').getByText('$120.5k')).toBeVisible();
   });
 
   test('clicking 7d updates Trends footer to "All segments · 7d"', async ({ page }) => {
@@ -29,7 +29,7 @@ test.describe('filter reactivity', () => {
       el.shadowRoot.querySelector('[data-range="7d"]').click();
     });
 
-    await expect(page.locator('[data-slot="side"]').getByText('All segments · 7d')).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('[data-slot="side"]').getByText('All segments · 7d')).toBeVisible();
   });
 
   test('changing segment to enterprise updates both KPI and Trends', async ({ page }) => {
@@ -43,8 +43,8 @@ test.describe('filter reactivity', () => {
     });
 
     // KPI revenue: 482k * 0.4 = 192.8k
-    await expect(page.locator('[data-slot="main"]').getByText('$192.8k')).toBeVisible({ timeout: 5000 });
-    await expect(page.locator('[data-slot="side"]').getByText('Enterprise · 30d')).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('[data-slot="main"]').getByText('$192.8k')).toBeVisible();
+    await expect(page.locator('[data-slot="side"]').getByText('Enterprise · 30d')).toBeVisible();
   });
 
   test('REQUEST_FILTER handshake restores filter after route switch', async ({ page }) => {
@@ -54,13 +54,13 @@ test.describe('filter reactivity', () => {
     await page.locator('[data-slot="toolbar"] filter-widget').evaluate((el) => {
       el.shadowRoot.querySelector('[data-range="7d"]').click();
     });
-    await expect(page.locator('[data-slot="main"]').getByText('$120.5k')).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('[data-slot="main"]').getByText('$120.5k')).toBeVisible();
 
     // Switch to admin route (only visible if admin permission — but default user doesn't have it)
     // So test the route switch back via Overview button (re-mount cycle)
     await page.click('.nav-btn.active'); // Click Overview again to re-trigger route
-    await expect(page.locator('[data-slot="main"]').getByText('KPI Summary')).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('[data-slot="main"]').getByText('KPI Summary')).toBeVisible();
     // After remount, KPI dispatches REQUEST_FILTER, filter responds with last state (7d)
-    await expect(page.locator('[data-slot="main"]').getByText('$120.5k')).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('[data-slot="main"]').getByText('$120.5k')).toBeVisible();
   });
 });

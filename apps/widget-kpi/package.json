@@ -4,8 +4,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview --port 5001",
+    "build": "vite build --config vite.config.v1-0-0.js && vite build --config vite.config.v1-1-0.js",
+    "build:v1-0-0": "vite build --config vite.config.v1-0-0.js",
+    "build:v1-1-0": "vite build --config vite.config.v1-1-0.js",
+    "preview": "vite preview --config vite.config.v1-0-0.js --port 5001",
+    "preview:v1-1-0": "vite preview --config vite.config.v1-1-0.js --port 5002",
     "test": "vitest run",
     "test:watch": "vitest"
   },

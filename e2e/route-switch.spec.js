@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 const ADMIN_URL = '/?permissions=dashboard.view,dashboard.admin';
 
 async function waitForOverview(page) {
-  await expect(page.locator('[data-slot="main"]').getByText('KPI Summary')).toBeVisible({ timeout: 15000 });
+  await expect(page.locator('[data-slot="main"]').getByText('KPI Summary')).toBeVisible();
 }
 
 test.describe('route switching', () => {
@@ -12,7 +12,7 @@ test.describe('route switching', () => {
     await waitForOverview(page);
 
     await page.locator('.nav-btn', { hasText: 'admin' }).click();
-    await expect(page.locator('body').getByText('Admin Panel')).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('body').getByText('Admin Panel')).toBeVisible();
     await expect(page.locator('[data-slot="main"]').getByText('KPI Summary')).not.toBeVisible();
   });
 
@@ -21,10 +21,10 @@ test.describe('route switching', () => {
     await waitForOverview(page);
 
     await page.locator('.nav-btn', { hasText: 'admin' }).click();
-    await expect(page.locator('body').getByText('Admin Panel')).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('body').getByText('Admin Panel')).toBeVisible();
 
     await page.locator('.nav-btn', { hasText: 'Overview' }).click();
-    await expect(page.locator('[data-slot="main"]').getByText('KPI Summary')).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('[data-slot="main"]').getByText('KPI Summary')).toBeVisible();
     await expect(page.locator('body').getByText('Admin Panel')).not.toBeVisible();
   });
 
@@ -35,9 +35,9 @@ test.describe('route switching', () => {
     // Switch back and forth 3 times
     for (let i = 0; i < 3; i++) {
       await page.locator('.nav-btn', { hasText: 'admin' }).click();
-      await expect(page.locator('body').getByText('Admin Panel')).toBeVisible({ timeout: 10000 });
+      await expect(page.locator('body').getByText('Admin Panel')).toBeVisible();
       await page.locator('.nav-btn', { hasText: 'Overview' }).click();
-      await expect(page.locator('[data-slot="main"]').getByText('KPI Summary')).toBeVisible({ timeout: 10000 });
+      await expect(page.locator('[data-slot="main"]').getByText('KPI Summary')).toBeVisible();
     }
 
     // Should still be exactly one KPI Summary heading

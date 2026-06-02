@@ -61,6 +61,14 @@ describe('computeKpis', () => {
     }
   });
 
+  it('consumer segment values are 22% of all segment', () => {
+    const all = computeKpis({ dateRange: '30d', segment: 'all' });
+    const consumer = computeKpis({ dateRange: '30d', segment: 'consumer' });
+    for (let i = 0; i < 4; i++) {
+      expect(consumer[i].value).toBeCloseTo(all[i].value * 0.22, 5);
+    }
+  });
+
   it('smb segment values are 38% of all segment', () => {
     const all = computeKpis({ dateRange: '30d', segment: 'all' });
     const smb = computeKpis({ dateRange: '30d', segment: 'smb' });

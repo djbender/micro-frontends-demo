@@ -31,7 +31,25 @@
         },
         "deployment": {
           "default": true,
-          "traffic": 100
+          "traffic": 90
+        },
+        "extras": {
+          "module": "./mount",
+          "slot": "main",
+          "route": "/overview",
+          "requiredPermissions": ["dashboard.view"]
+        }
+      },
+      {
+        "url": "http://localhost:5002/remoteEntry.js",
+        "fallbackUrl": "http://localhost:5002/remoteEntry.js",
+        "metadata": {
+          "integrity": "",
+          "version": "1.1.0"
+        },
+        "deployment": {
+          "default": false,
+          "traffic": 10
         },
         "extras": {
           "module": "./mount",

@@ -1,13 +1,16 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { federation } from '@module-federation/vite';
-import pkg from './package.json' with { type: 'json' };
+
+const port = 5002;
+const version = '1.1.0';
+const origin = `http://localhost:${port}`;
 
 export default defineConfig({
   plugins: [
     react(),
     federation({
-      name: 'widget-kpi',
+      name: `widget-kpi_${version.replace(/\./g, '_')}`,
       filename: 'remoteEntry.js',
       exposes: {
         './mount': './src/mount.jsx',
@@ -20,15 +23,16 @@ export default defineConfig({
     }),
   ],
   define: {
-    __WIDGET_VERSION__: JSON.stringify(pkg.version),
+    'import.meta.env.VITE_WIDGET_VERSION': JSON.stringify(version),
   },
   server: {
-    port: 5001,
-    origin: 'http://localhost:5001',
+    port,
+    origin,
     cors: true,
   },
-  base: 'http://localhost:5001/',
+  base: `${origin}/`,
   build: {
     target: 'esnext',
+    outDir: 'dist/v1-1-0',
   },
 });

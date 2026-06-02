@@ -4,7 +4,8 @@ import concurrently from 'concurrently'
 const { result } = concurrently(
   [
     { command: 'pnpm --filter shell dev',         name: 'shell'  },
-    { command: 'pnpm --filter widget-kpi dev',    name: 'kpi'    },
+    { command: 'pnpm --filter widget-kpi dev --config vite.config.v1-0-0.js', name: 'kpi'      },
+    { command: 'pnpm --filter widget-kpi dev --config vite.config.v1-1-0.js', name: 'kpi-v1.1' },
     { command: 'pnpm --filter widget-trends dev', name: 'trends' },
     { command: 'pnpm --filter widget-filter dev', name: 'filter' },
     { command: 'pnpm --filter widget-admin dev',  name: 'admin'  },

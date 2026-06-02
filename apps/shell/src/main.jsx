@@ -9,4 +9,6 @@ const currentUser = permParam
   ? { permissions: permParam.split(',').map(p => p.trim()) }
   : { permissions: ['dashboard.view'] };
 
-createRoot(document.getElementById('root')).render(<Shell currentUser={currentUser} />);
+const userToken = params.get('token') ?? null;
+
+createRoot(document.getElementById('root')).render(<Shell currentUser={currentUser} userToken={userToken} />);

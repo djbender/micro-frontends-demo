@@ -1,10 +1,11 @@
 # MFE Dashboard Demo
 
-A runtime-composed micro-frontend dashboard that visibly proves three things:
+A runtime-composed micro-frontend dashboard that visibly proves four things:
 
 1. Independent deploy/versioning — rebuild and redeploy one widget without touching the shell.
 2. Cross-framework communication — React, Svelte 5, and a Web Component talk across framework boundaries via a native `EventTarget` bus.
 3. Shared look, isolated styles — one consistent theme, no style leakage, no shared dependency.
+4. Traffic splitting & canary deploys — deterministic client-side bucketing routes users to widget versions by percentage, with no infrastructure change.
 
 ## Requirements
 
@@ -36,7 +37,8 @@ This starts all five apps in parallel:
 | App | URL | Framework |
 |---|---|---|
 | Shell | http://localhost:5000 | React 19 |
-| widget-kpi | http://localhost:5001 | React 19 |
+| widget-kpi v1.0.0 | http://localhost:5001 | React 19 |
+| widget-kpi v1.1.0 | http://localhost:5002 | React 19 (canary) |
 | widget-trends | http://localhost:5003 | Svelte 5 |
 | widget-filter | http://localhost:5004 | Web Component |
 | widget-admin | http://localhost:5005 | React 19 |
@@ -69,6 +71,16 @@ To unlock admin:
 - The admin nav button appears; click it to see the gated panel.
 
 No rebuild. No widget change. Only the shell's mock user object changed.
+
+### Traffic splitting (`?token=`)
+
+`widget-kpi` in `discovery.local.json` has two versions: v1.0.0 at 90% traffic and v1.1.0 at 10%. The shell hashes a user token against the active version URLs (djb2, 1–100 bucket) to deterministically select one. The resolved bucket is shown as a chip in the header.
+
+Two special tokens bypass the hash and force a specific cohort:
+- `http://localhost:5000?token=default` — bucket 1, always gets **v1.0.0** (the 90% version)
+- `http://localhost:5000?token=canary` — bucket 100, always gets **v1.1.0** (the 10% version)
+
+Any other token value is hashed deterministically — the same token always produces the same bucket across page reloads. Omit `?token=` and a random UUID is generated per session.
 
 ### Independent deploy
 

@@ -24,7 +24,7 @@ export default function KpiWidget({ bus }) {
     <div className={styles.widget}>
       <div className={styles.header}>
         <h2 className={styles.title}>KPI Summary</h2>
-        <span className={styles.badge}>v{__WIDGET_VERSION__}</span>
+        <span className={styles.badge}>v{import.meta.env.VITE_WIDGET_VERSION}</span>
       </div>
       <div className={styles.grid}>
         {kpis.map(({ key, label, unit, value, change }) => (
