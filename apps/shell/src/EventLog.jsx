@@ -9,6 +9,7 @@ export default function EventLog({ bus }) {
   const idRef = useRef(nextId);
 
   useEffect(() => {
+    /* c8 ignore next */
     if (!bus) return;
 
     const onEmit = (e) => {

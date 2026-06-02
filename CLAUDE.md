@@ -60,7 +60,14 @@ Widgets MAY import `TOPICS` from `@demo/contracts` or use string literals.
 
 ### Discovery manifest
 
-`discovery/discovery.local.json` is the runtime manifest served from `apps/shell/public/`. Override via `VITE_DISCOVERY_URL` env var (no rebuild needed — swap to staging/CDN). Schema: `schemaVersion` + `mfes[]` with `name`, `url`, `module`, `slot`, `route`, `requiredPermissions[]`, `version`.
+`apps/shell/public/discovery.local.json` is the local dev manifest served by the shell's static file server. Override via `VITE_DISCOVERY_URL` env var (no rebuild needed — swap to staging/CDN). Schema aligns with the [AWS Frontend Discovery Service](https://github.com/awslabs/frontend-discovery-service) (`schema/v1-pre.json`):
+
+- Top level: `schema` (URL string) + `microFrontends` (object keyed by widget name)
+- Each key holds an array of version entries; the shell picks `deployment.default === true` or the first entry
+- Each entry: `url`, optional `fallbackUrl`, `metadata.integrity` (empty string in dev), `metadata.version`, optional `deployment.{ default, traffic }`
+- Project-specific fields (`module`, `slot`, `route`, `requiredPermissions`) live in `extras`
+
+If `fallbackUrl` differs from `url` and `loadRemote` throws, the shell re-inits with the fallback URL and retries.
 
 ### Permission gating
 

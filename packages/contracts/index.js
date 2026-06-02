@@ -7,8 +7,14 @@ export const TOPICS = {
 /**
  * @typedef {{ dateRange: string, segment: string }} FilterDetail
  * @typedef {{ actor: string, topic: string, payload: FilterDetail }} ConsumedDetail
- * @typedef {{ name: string, url: string, module: string, slot: string, route: string, requiredPermissions: string[], version: string }} ManifestEntry
- * @typedef {{ schemaVersion: string, mfes: ManifestEntry[] }} Manifest
+ * @typedef {{
+ *   url: string,
+ *   fallbackUrl?: string,
+ *   metadata: { integrity: string, version: string },
+ *   deployment?: { default?: boolean, traffic?: number },
+ *   extras: { module: string, slot: string, route: string, requiredPermissions: string[] }
+ * }} ManifestEntry
+ * @typedef {{ schema: string, microFrontends: Record<string, ManifestEntry[]> }} Manifest
  */
 
 /**
@@ -16,19 +22,28 @@ export const TOPICS = {
  * @returns {{ valid: boolean, error?: string }}
  */
 export function validateManifest(json) {
-  if (!json || typeof json !== 'object')
+  if (!json || typeof json !== 'object' || Array.isArray(json))
     return { valid: false, error: 'Not an object' };
-  if (!json.schemaVersion)
-    return { valid: false, error: 'Missing schemaVersion' };
-  if (!Array.isArray(json.mfes))
-    return { valid: false, error: 'Missing mfes array' };
-  for (const entry of json.mfes) {
-    for (const field of ['name', 'url', 'module', 'slot', 'route']) {
-      if (!entry[field])
-        return { valid: false, error: `Entry missing field: ${field}` };
-    }
-    if (!Array.isArray(entry.requiredPermissions)) {
-      return { valid: false, error: `Entry ${entry.name} missing requiredPermissions array` };
+  if (!json.schema || typeof json.schema !== 'string')
+    return { valid: false, error: 'Missing schema' };
+  if (!json.microFrontends || typeof json.microFrontends !== 'object' || Array.isArray(json.microFrontends))
+    return { valid: false, error: 'Missing microFrontends object' };
+  for (const [name, versions] of Object.entries(json.microFrontends)) {
+    if (!Array.isArray(versions) || versions.length === 0)
+      return { valid: false, error: `microFrontends["${name}"] must be a non-empty array` };
+    for (const entry of versions) {
+      if (!entry.url || typeof entry.url !== 'string')
+        return { valid: false, error: `Entry in "${name}" missing url` };
+      if (!entry.metadata || typeof entry.metadata.integrity !== 'string')
+        return { valid: false, error: `Entry in "${name}" missing metadata.integrity` };
+      if (!entry.metadata.version || typeof entry.metadata.version !== 'string')
+        return { valid: false, error: `Entry in "${name}" missing metadata.version` };
+      if (!entry.extras?.slot)
+        return { valid: false, error: `Entry in "${name}" missing extras.slot` };
+      if (!entry.extras?.route)
+        return { valid: false, error: `Entry in "${name}" missing extras.route` };
+      if (!Array.isArray(entry.extras?.requiredPermissions))
+        return { valid: false, error: `Entry in "${name}" missing extras.requiredPermissions array` };
     }
   }
   return { valid: true };

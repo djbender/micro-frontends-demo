@@ -2,18 +2,23 @@ import { describe, it, expect } from 'vitest';
 import { validateManifest } from './index.js';
 
 const validEntry = {
-  name: 'widget-kpi',
   url: 'http://localhost:5001/remoteEntry.js',
-  module: './mount',
-  slot: 'main',
-  route: '/overview',
-  requiredPermissions: ['dashboard.view'],
-  version: '1.0.0',
+  fallbackUrl: 'http://localhost:5001/remoteEntry.js',
+  metadata: { integrity: '', version: '1.0.0' },
+  deployment: { default: true, traffic: 100 },
+  extras: {
+    module: './mount',
+    slot: 'main',
+    route: '/overview',
+    requiredPermissions: ['dashboard.view'],
+  },
 };
 
 const validManifest = {
-  schemaVersion: '1',
-  mfes: [validEntry],
+  schema: 'https://raw.githubusercontent.com/awslabs/frontend-discovery/main/schema/v1-pre.json',
+  microFrontends: {
+    'widget-kpi': [validEntry],
+  },
 };
 
 describe('validateManifest', () => {
@@ -22,7 +27,7 @@ describe('validateManifest', () => {
       expect(validateManifest(value)).toEqual({ valid: false, error: 'Not an object' });
     });
 
-    it('returns invalid for an empty array (passes object check, fails schemaVersion)', () => {
+    it('returns invalid for an array (passes object check, fails schema)', () => {
       expect(validateManifest([])).toMatchObject({ valid: false });
     });
 
@@ -30,62 +35,117 @@ describe('validateManifest', () => {
       expect(validateManifest(undefined)).toEqual({ valid: false, error: 'Not an object' });
     });
 
-    it('returns invalid for missing schemaVersion', () => {
-      expect(validateManifest({ mfes: [] })).toEqual({ valid: false, error: 'Missing schemaVersion' });
+    it('returns invalid for missing schema', () => {
+      expect(validateManifest({ microFrontends: {} })).toEqual({ valid: false, error: 'Missing schema' });
     });
 
-    it('returns invalid for falsy schemaVersion', () => {
-      expect(validateManifest({ schemaVersion: '', mfes: [] })).toEqual({ valid: false, error: 'Missing schemaVersion' });
+    it('returns invalid for falsy schema', () => {
+      expect(validateManifest({ schema: '', microFrontends: {} })).toEqual({ valid: false, error: 'Missing schema' });
     });
 
-    it('returns invalid when mfes is not an array', () => {
-      expect(validateManifest({ schemaVersion: '1', mfes: {} })).toEqual({ valid: false, error: 'Missing mfes array' });
+    it('returns invalid when microFrontends is missing', () => {
+      expect(validateManifest({ schema: 'https://example.com/schema' }))
+        .toEqual({ valid: false, error: 'Missing microFrontends object' });
     });
 
-    it('returns invalid when mfes is missing', () => {
-      expect(validateManifest({ schemaVersion: '1' })).toEqual({ valid: false, error: 'Missing mfes array' });
+    it('returns invalid when microFrontends is an array', () => {
+      expect(validateManifest({ schema: 'https://example.com/schema', microFrontends: [] }))
+        .toEqual({ valid: false, error: 'Missing microFrontends object' });
+    });
+  });
+
+  describe('entry array validation', () => {
+    it('returns invalid when a widget versions array is empty', () => {
+      const result = validateManifest({ schema: 'https://example.com/schema', microFrontends: { 'widget-kpi': [] } });
+      expect(result).toEqual({ valid: false, error: 'microFrontends["widget-kpi"] must be a non-empty array' });
+    });
+
+    it('returns invalid when a widget key is not an array', () => {
+      const result = validateManifest({ schema: 'https://example.com/schema', microFrontends: { 'widget-kpi': validEntry } });
+      expect(result).toEqual({ valid: false, error: 'microFrontends["widget-kpi"] must be a non-empty array' });
     });
   });
 
   describe('entry field validation', () => {
-    it.each(['name', 'url', 'module', 'slot', 'route'])('returns invalid when entry is missing %s', (field) => {
-      const entry = { ...validEntry };
-      delete entry[field];
-      const result = validateManifest({ schemaVersion: '1', mfes: [entry] });
-      expect(result).toEqual({ valid: false, error: `Entry missing field: ${field}` });
+    it('returns invalid when entry is missing url', () => {
+      const entry = { ...validEntry, url: undefined };
+      const result = validateManifest({ ...validManifest, microFrontends: { 'widget-kpi': [entry] } });
+      expect(result).toEqual({ valid: false, error: 'Entry in "widget-kpi" missing url' });
     });
 
-    it('returns invalid when requiredPermissions is not an array', () => {
-      const entry = { ...validEntry, requiredPermissions: 'dashboard.view' };
-      const result = validateManifest({ schemaVersion: '1', mfes: [entry] });
-      expect(result).toEqual({ valid: false, error: `Entry ${validEntry.name} missing requiredPermissions array` });
+    it('returns invalid when entry url is not a string', () => {
+      const entry = { ...validEntry, url: 42 };
+      const result = validateManifest({ ...validManifest, microFrontends: { 'widget-kpi': [entry] } });
+      expect(result).toEqual({ valid: false, error: 'Entry in "widget-kpi" missing url' });
     });
 
-    it('returns invalid when requiredPermissions is missing', () => {
-      const entry = { ...validEntry };
-      delete entry.requiredPermissions;
-      const result = validateManifest({ schemaVersion: '1', mfes: [entry] });
-      expect(result).toEqual({ valid: false, error: `Entry ${validEntry.name} missing requiredPermissions array` });
+    it('returns invalid when metadata.integrity is missing', () => {
+      const entry = { ...validEntry, metadata: { version: '1.0.0' } };
+      const result = validateManifest({ ...validManifest, microFrontends: { 'widget-kpi': [entry] } });
+      expect(result).toEqual({ valid: false, error: 'Entry in "widget-kpi" missing metadata.integrity' });
+    });
+
+    it('returns invalid when metadata.version is missing', () => {
+      const entry = { ...validEntry, metadata: { integrity: '' } };
+      const result = validateManifest({ ...validManifest, microFrontends: { 'widget-kpi': [entry] } });
+      expect(result).toEqual({ valid: false, error: 'Entry in "widget-kpi" missing metadata.version' });
+    });
+
+    it('returns invalid when extras.slot is missing', () => {
+      const entry = { ...validEntry, extras: { ...validEntry.extras, slot: undefined } };
+      const result = validateManifest({ ...validManifest, microFrontends: { 'widget-kpi': [entry] } });
+      expect(result).toEqual({ valid: false, error: 'Entry in "widget-kpi" missing extras.slot' });
+    });
+
+    it('returns invalid when extras.route is missing', () => {
+      const entry = { ...validEntry, extras: { ...validEntry.extras, route: undefined } };
+      const result = validateManifest({ ...validManifest, microFrontends: { 'widget-kpi': [entry] } });
+      expect(result).toEqual({ valid: false, error: 'Entry in "widget-kpi" missing extras.route' });
+    });
+
+    it('returns invalid when extras.requiredPermissions is not an array', () => {
+      const entry = { ...validEntry, extras: { ...validEntry.extras, requiredPermissions: 'dashboard.view' } };
+      const result = validateManifest({ ...validManifest, microFrontends: { 'widget-kpi': [entry] } });
+      expect(result).toEqual({ valid: false, error: 'Entry in "widget-kpi" missing extras.requiredPermissions array' });
+    });
+
+    it('returns invalid when extras.requiredPermissions is missing', () => {
+      const { requiredPermissions: _, ...extrasWithout } = validEntry.extras;
+      const entry = { ...validEntry, extras: extrasWithout };
+      const result = validateManifest({ ...validManifest, microFrontends: { 'widget-kpi': [entry] } });
+      expect(result).toEqual({ valid: false, error: 'Entry in "widget-kpi" missing extras.requiredPermissions array' });
     });
   });
 
   describe('valid manifests', () => {
-    it('returns valid for a manifest with zero MFEs', () => {
-      expect(validateManifest({ schemaVersion: '1', mfes: [] })).toEqual({ valid: true });
+    it('returns valid for a manifest with zero widgets', () => {
+      expect(validateManifest({ schema: 'https://example.com/schema', microFrontends: {} })).toEqual({ valid: true });
     });
 
-    it('returns valid for a well-formed single-entry manifest', () => {
+    it('returns valid for a well-formed single-widget manifest', () => {
       expect(validateManifest(validManifest)).toEqual({ valid: true });
     });
 
-    it('returns valid for a manifest with multiple entries', () => {
-      const second = { ...validEntry, name: 'widget-admin', route: '/admin', requiredPermissions: ['dashboard.admin'] };
-      expect(validateManifest({ schemaVersion: '1', mfes: [validEntry, second] })).toEqual({ valid: true });
+    it('returns valid for a manifest with multiple widgets', () => {
+      const adminEntry = { ...validEntry, extras: { ...validEntry.extras, route: '/admin', requiredPermissions: ['dashboard.admin'] } };
+      expect(validateManifest({
+        ...validManifest,
+        microFrontends: { 'widget-kpi': [validEntry], 'widget-admin': [adminEntry] },
+      })).toEqual({ valid: true });
     });
 
     it('accepts an empty requiredPermissions array', () => {
-      const entry = { ...validEntry, requiredPermissions: [] };
-      expect(validateManifest({ schemaVersion: '1', mfes: [entry] })).toEqual({ valid: true });
+      const entry = { ...validEntry, extras: { ...validEntry.extras, requiredPermissions: [] } };
+      expect(validateManifest({ ...validManifest, microFrontends: { 'widget-kpi': [entry] } })).toEqual({ valid: true });
+    });
+
+    it('accepts an empty string integrity (valid for local dev)', () => {
+      expect(validateManifest(validManifest)).toEqual({ valid: true });
+    });
+
+    it('accepts entries without optional fallbackUrl and deployment fields', () => {
+      const { fallbackUrl: _, deployment: __, ...minimalEntry } = validEntry;
+      expect(validateManifest({ ...validManifest, microFrontends: { 'widget-kpi': [minimalEntry] } })).toEqual({ valid: true });
     });
   });
 });

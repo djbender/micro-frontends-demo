@@ -4,8 +4,9 @@ import { validateManifest } from '@demo/contracts';
 import EventLog from './EventLog.jsx';
 
 const DISCOVERY_URL = import.meta.env.VITE_DISCOVERY_URL ?? '/discovery.local.json';
+const DEFAULT_USER = { permissions: ['dashboard.view'] };
 
-export default function Shell({ currentUser = { permissions: ['dashboard.view'] } }) {
+export default function Shell({ currentUser = DEFAULT_USER }) {
   const [route, setRoute] = useState('/overview');
   const [theme, setTheme] = useState('light');
   const [status, setStatus] = useState('loading');
@@ -35,9 +36,12 @@ export default function Shell({ currentUser = { permissions: ['dashboard.view'] 
         return;
       }
 
-      const allowed = manifest.mfes.filter(m =>
-        m.requiredPermissions.every(p => currentUser.permissions.includes(p))
-      );
+      const allowed = Object.entries(manifest.microFrontends).flatMap(([name, versions]) => {
+        const entry = versions.find(v => v.deployment?.default) ?? versions[0];
+        const { slot, route, requiredPermissions, module: mod } = entry.extras;
+        if (!requiredPermissions.every(p => currentUser.permissions.includes(p))) return [];
+        return [{ name, url: entry.url, fallbackUrl: entry.fallbackUrl, module: mod, slot, route }];
+      });
 
       await init({
         name: 'shell',
@@ -62,7 +66,17 @@ export default function Shell({ currentUser = { permissions: ['dashboard.view'] 
     const bus = busRef.current;
     for (const mfe of mfes) {
       try {
-        const mod = await loadRemote(`${mfe.name}/${mfe.module.replace('./', '')}`);
+        let mod;
+        try {
+          mod = await loadRemote(`${mfe.name}/${mfe.module.replace('./', '')}`);
+        } catch (e) {
+          if (mfe.fallbackUrl && mfe.fallbackUrl !== mfe.url) {
+            await init({ name: 'shell', remotes: [{ name: mfe.name, entry: mfe.fallbackUrl, type: 'module' }] });
+            mod = await loadRemote(`${mfe.name}/${mfe.module.replace('./', '')}`);
+          } else {
+            throw e;
+          }
+        }
         const slot = document.querySelector(`[data-slot="${mfe.slot}"]`);
         if (!slot) continue;
         const wrapper = document.createElement('div');

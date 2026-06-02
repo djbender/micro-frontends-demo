@@ -1,5 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { FilterWidget } from './FilterWidget.js';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { mount } from './mount.js';
 
 function makeBus() {

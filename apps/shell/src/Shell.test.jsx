@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 
 vi.mock('@module-federation/runtime', () => ({
   init: vi.fn().mockResolvedValue(undefined),
@@ -10,29 +10,35 @@ vi.mock('./styles.css', () => ({}));
 import Shell from './Shell.jsx';
 import { loadRemote } from '@module-federation/runtime';
 
+const SCHEMA = 'https://raw.githubusercontent.com/awslabs/frontend-discovery/main/schema/v1-pre.json';
+
+function makeEntry(url, { module: mod = './mount', slot, route, requiredPermissions, version = '1.0.0' } = {}) {
+  return { url, metadata: { integrity: '', version }, deployment: { default: true, traffic: 100 }, extras: { module: mod, slot, route, requiredPermissions } };
+}
+
 const BASE_MANIFEST = {
-  schemaVersion: '1',
-  mfes: [
-    { name: 'widget-filter', url: 'http://localhost:5004/remoteEntry.js', module: './mount', slot: 'toolbar', route: '/overview', requiredPermissions: ['dashboard.view'], version: '1.0.0' },
-    { name: 'widget-kpi', url: 'http://localhost:5001/remoteEntry.js', module: './mount', slot: 'main', route: '/overview', requiredPermissions: ['dashboard.view'], version: '1.0.0' },
-    { name: 'widget-trends', url: 'http://localhost:5003/remoteEntry.js', module: './mount', slot: 'side', route: '/overview', requiredPermissions: ['dashboard.view'], version: '1.0.0' },
-    { name: 'widget-admin', url: 'http://localhost:5005/remoteEntry.js', module: './mount', slot: 'main', route: '/admin', requiredPermissions: ['dashboard.view', 'dashboard.admin'], version: '1.0.0' },
-  ],
+  schema: SCHEMA,
+  microFrontends: {
+    'widget-filter': [makeEntry('http://localhost:5004/remoteEntry.js', { slot: 'toolbar', route: '/overview', requiredPermissions: ['dashboard.view'] })],
+    'widget-kpi':    [makeEntry('http://localhost:5001/remoteEntry.js', { slot: 'main',    route: '/overview', requiredPermissions: ['dashboard.view'] })],
+    'widget-trends': [makeEntry('http://localhost:5003/remoteEntry.js', { slot: 'side',    route: '/overview', requiredPermissions: ['dashboard.view'] })],
+    'widget-admin':  [makeEntry('http://localhost:5005/remoteEntry.js', { slot: 'main',    route: '/admin',    requiredPermissions: ['dashboard.view', 'dashboard.admin'] })],
+  },
 };
 
 const NO_OVERVIEW_MANIFEST = {
-  schemaVersion: '1',
-  mfes: [
-    { name: 'widget-report', url: 'http://localhost:5006/remoteEntry.js', module: './mount', slot: 'main', route: '/reports', requiredPermissions: ['dashboard.view'], version: '1.0.0' },
-  ],
+  schema: SCHEMA,
+  microFrontends: {
+    'widget-report': [makeEntry('http://localhost:5006/remoteEntry.js', { slot: 'main', route: '/reports', requiredPermissions: ['dashboard.view'] })],
+  },
 };
 
 const GHOST_SLOT_MANIFEST = {
-  schemaVersion: '1',
-  mfes: [
-    { name: 'widget-real',  url: 'http://localhost:5007/remoteEntry.js', module: './mount', slot: 'main',  route: '/overview', requiredPermissions: ['dashboard.view'], version: '1.0.0' },
-    { name: 'widget-ghost', url: 'http://localhost:5008/remoteEntry.js', module: './mount', slot: 'ghost', route: '/overview', requiredPermissions: ['dashboard.view'], version: '1.0.0' },
-  ],
+  schema: SCHEMA,
+  microFrontends: {
+    'widget-real':  [makeEntry('http://localhost:5007/remoteEntry.js', { slot: 'main',  route: '/overview', requiredPermissions: ['dashboard.view'] })],
+    'widget-ghost': [makeEntry('http://localhost:5008/remoteEntry.js', { slot: 'ghost', route: '/overview', requiredPermissions: ['dashboard.view'] })],
+  },
 };
 
 function mockFetch(manifest) {
@@ -56,24 +62,32 @@ describe('Shell', () => {
 
   it('shows error state when fetch rejects', async () => {
     global.fetch = vi.fn().mockRejectedValue(new Error('Network down'));
-    render(<Shell />);
-    await screen.findByText(/Manifest error:/);
+    await act(async () => { render(<Shell />); });
     expect(screen.getByText(/Manifest error:/)).toBeInTheDocument();
   });
 
   it('shows error state when manifest is invalid', async () => {
-    mockFetch({ schemaVersion: '1' }); // missing mfes
-    render(<Shell />);
-    await screen.findByText(/Manifest error:/);
+    mockFetch({ schema: SCHEMA }); // missing microFrontends
+    await act(async () => { render(<Shell />); });
     expect(screen.getByText(/Manifest error:/)).toBeInTheDocument();
+  });
+
+  it('boots correctly when version entry has no deployment field (falls back to versions[0])', async () => {
+    const { deployment: _, ...entryWithoutDeployment } = BASE_MANIFEST.microFrontends['widget-kpi'][0];
+    const manifest = {
+      schema: SCHEMA,
+      microFrontends: { 'widget-kpi': [entryWithoutDeployment] },
+    };
+    mockFetch(manifest);
+    await act(async () => { render(<Shell currentUser={{ permissions: ['dashboard.view'] }} />); });
+    screen.getByText('Overview');
+    expect(loadRemote).toHaveBeenCalledWith('widget-kpi/mount');
   });
 
   it('loads kpi/filter/trends but not admin for dashboard.view-only user', async () => {
     mockFetch(BASE_MANIFEST);
-    render(<Shell currentUser={{ permissions: ['dashboard.view'] }} />);
-    // Wait for boot to complete (nav shows up)
-    await screen.findByText('Overview');
-    await waitFor(() => expect(loadRemote).toHaveBeenCalled());
+    await act(async () => { render(<Shell currentUser={{ permissions: ['dashboard.view'] }} />); });
+    screen.getByText('Overview');
     const loaded = loadRemote.mock.calls.map(([name]) => name);
     expect(loaded).toContain('widget-filter/mount');
     expect(loaded).toContain('widget-kpi/mount');
@@ -83,43 +97,41 @@ describe('Shell', () => {
 
   it('does not show admin route button for non-admin user', async () => {
     mockFetch(BASE_MANIFEST);
-    render(<Shell currentUser={{ permissions: ['dashboard.view'] }} />);
-    await screen.findByText('Overview');
+    await act(async () => { render(<Shell currentUser={{ permissions: ['dashboard.view'] }} />); });
+    screen.getByText('Overview');
     expect(screen.queryByText('admin')).not.toBeInTheDocument();
   });
 
   it('shows admin route button for admin user', async () => {
     mockFetch(BASE_MANIFEST);
-    render(<Shell currentUser={{ permissions: ['dashboard.view', 'dashboard.admin'] }} />);
-    await screen.findByText('Overview');
-    await screen.findByText('admin');
+    await act(async () => { render(<Shell currentUser={{ permissions: ['dashboard.view', 'dashboard.admin'] }} />); });
+    screen.getByText('Overview');
     expect(screen.getByText('admin')).toBeInTheDocument();
   });
 
   it('clicking a nav button changes the active route', async () => {
     mockFetch(BASE_MANIFEST);
-    render(<Shell currentUser={{ permissions: ['dashboard.view', 'dashboard.admin'] }} />);
-    await screen.findByText('Overview');
-    const adminBtn = await screen.findByText('admin');
-    fireEvent.click(adminBtn);
-    await waitFor(() => expect(adminBtn.className).toMatch(/active/));
+    await act(async () => { render(<Shell currentUser={{ permissions: ['dashboard.view', 'dashboard.admin'] }} />); });
+    const adminBtn = screen.getByText('admin');
+    await act(async () => { fireEvent.click(adminBtn); });
+    expect(adminBtn.className).toMatch(/active/);
   });
 
   it('logs error when loadRemote throws for a widget', async () => {
     mockFetch(BASE_MANIFEST);
     loadRemote.mockRejectedValue(new Error('chunk load failed'));
     const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    render(<Shell currentUser={{ permissions: ['dashboard.view'] }} />);
-    await screen.findByText('Overview');
-    await waitFor(() => expect(spy).toHaveBeenCalled());
+    await act(async () => { render(<Shell currentUser={{ permissions: ['dashboard.view'] }} />); });
+    screen.getByText('Overview');
+    expect(spy).toHaveBeenCalled();
     expect(spy.mock.calls[0][0]).toMatch(/Failed to load/);
     spy.mockRestore();
   });
 
   it('toggles data-theme attribute on theme button click and back', async () => {
     mockFetch(BASE_MANIFEST);
-    render(<Shell />);
-    const toggle = await screen.findByLabelText('Toggle theme');
+    await act(async () => { render(<Shell />); });
+    const toggle = screen.getByLabelText('Toggle theme');
     expect(document.documentElement.getAttribute('data-theme')).toBe('light');
     fireEvent.click(toggle);
     expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
@@ -131,9 +143,9 @@ describe('Shell', () => {
     mockFetch(BASE_MANIFEST);
     const mountFn = vi.fn().mockReturnValue(vi.fn());
     loadRemote.mockResolvedValue({ mount: mountFn });
-    render(<Shell currentUser={{ permissions: ['dashboard.view'] }} />);
-    await screen.findByText('Overview');
-    await waitFor(() => expect(mountFn).toHaveBeenCalled(), { timeout: 2000 });
+    await act(async () => { render(<Shell currentUser={{ permissions: ['dashboard.view'] }} />); });
+    screen.getByText('Overview');
+    expect(mountFn).toHaveBeenCalled();
     expect(mountFn).toHaveBeenCalledWith(expect.any(HTMLElement), expect.objectContaining({ bus: expect.any(EventTarget) }));
   });
 
@@ -142,12 +154,45 @@ describe('Shell', () => {
     const mountFn = vi.fn().mockReturnValue(vi.fn());
     loadRemote.mockResolvedValue({ mount: mountFn });
 
-    render(<Shell currentUser={{ permissions: ['dashboard.view'] }} />);
+    await act(async () => { render(<Shell currentUser={{ permissions: ['dashboard.view'] }} />); });
 
-    await screen.findByText('reports'); // boot done; /reports is the only navRoute
+    screen.getByText('reports'); // boot done; /reports is the only navRoute
     expect(screen.queryByText('Overview')).not.toBeInTheDocument();
     expect(loadRemote).not.toHaveBeenCalled();
     expect(mountFn).not.toHaveBeenCalled();
+  });
+
+  it('retries loadRemote with fallbackUrl when primary loadRemote throws and fallback differs', async () => {
+    const fallbackUrl = 'http://cdn.example.com/widget-kpi/remoteEntry.js';
+    const manifest = {
+      schema: SCHEMA,
+      microFrontends: {
+        'widget-kpi': [{
+          url: 'http://localhost:5001/remoteEntry.js',
+          fallbackUrl,
+          metadata: { integrity: '', version: '1.0.0' },
+          deployment: { default: true, traffic: 100 },
+          extras: { module: './mount', slot: 'main', route: '/overview', requiredPermissions: ['dashboard.view'] },
+        }],
+      },
+    };
+    mockFetch(manifest);
+
+    const { init: mockInit } = await import('@module-federation/runtime');
+    const mountFn = vi.fn().mockReturnValue(vi.fn());
+    loadRemote
+      .mockRejectedValueOnce(new Error('chunk load failed'))
+      .mockResolvedValueOnce({ mount: mountFn });
+
+    await act(async () => { render(<Shell currentUser={{ permissions: ['dashboard.view'] }} />); });
+    screen.getByText('Overview');
+
+    const fallbackInitCall = mockInit.mock.calls.find(
+      ([cfg]) => cfg.remotes?.[0]?.entry === fallbackUrl
+    );
+    expect(fallbackInitCall).toBeDefined();
+    expect(loadRemote).toHaveBeenCalledTimes(2);
+    expect(mountFn).toHaveBeenCalledWith(expect.any(HTMLElement), expect.objectContaining({ bus: expect.any(EventTarget) }));
   });
 
   it('skips a widget whose slot does not exist in the DOM (!slot continue)', async () => {
@@ -155,14 +200,12 @@ describe('Shell', () => {
     const mountFn = vi.fn().mockReturnValue(vi.fn());
     loadRemote.mockResolvedValue({ mount: mountFn });
 
-    render(<Shell currentUser={{ permissions: ['dashboard.view'] }} />);
-    await screen.findByText('Overview');
+    await act(async () => { render(<Shell currentUser={{ permissions: ['dashboard.view'] }} />); });
+    screen.getByText('Overview');
 
-    await waitFor(() => {
-      const loaded = loadRemote.mock.calls.map(([name]) => name);
-      expect(loaded).toContain('widget-real/mount');
-      expect(loaded).toContain('widget-ghost/mount');
-    });
+    const loaded = loadRemote.mock.calls.map(([name]) => name);
+    expect(loaded).toContain('widget-real/mount');
+    expect(loaded).toContain('widget-ghost/mount');
 
     expect(mountFn).toHaveBeenCalledTimes(1); // only the real-slot widget mounts; ghost hit `continue`
     expect(mountFn).toHaveBeenCalledWith(

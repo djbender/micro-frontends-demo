@@ -2,6 +2,7 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
+    css: false,
     projects: [
       'apps/shell/vitest.config.js',
       'apps/widget-admin/vitest.config.js',
@@ -14,6 +15,7 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'html'],
       reportsDirectory: './coverage',
+      exclude: ['**/*.css'],
     },
   },
 });
