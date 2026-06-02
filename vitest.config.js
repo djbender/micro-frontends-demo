@@ -4,6 +4,7 @@ export default defineConfig({
   test: {
     css: false,
     projects: [
+      'apps/fds-api/vitest.config.js',
       'apps/shell/vitest.config.js',
       'apps/widget-admin/vitest.config.js',
       'apps/widget-filter/vitest.config.js',

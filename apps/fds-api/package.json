@@ -1,0 +1,15 @@
+{
+  "name": "fds-api",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node server.js",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@demo/contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.7"
+  }
+}

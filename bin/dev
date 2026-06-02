@@ -9,6 +9,7 @@ const { result } = concurrently(
     { command: 'pnpm --filter widget-trends dev', name: 'trends' },
     { command: 'pnpm --filter widget-filter dev', name: 'filter' },
     { command: 'pnpm --filter widget-admin dev',  name: 'admin'  },
+    { command: 'pnpm --filter fds-api dev',       name: 'fds-api' },
   ],
   { killOthers: ['failure'] }
 )

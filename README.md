@@ -5,11 +5,11 @@ A runtime-composed micro-frontend dashboard that visibly proves four things:
 1. Independent deploy/versioning — rebuild and redeploy one widget without touching the shell.
 2. Cross-framework communication — React, Svelte 5, and a Web Component talk across framework boundaries via a native `EventTarget` bus.
 3. Shared look, isolated styles — one consistent theme, no style leakage, no shared dependency.
-4. Traffic splitting & canary deploys — deterministic client-side bucketing routes users to widget versions by percentage, with no infrastructure change.
+4. Server-side traffic splitting & canary deploys — the Consumer API resolves widget versions server-side, returning a single-entry manifest with no client-side selection logic.
 
 ## Requirements
 
-- Node 26.2.0 — use [fnm](https://github.com/Schniz/fnm) or [nvm](https://github.com/nvm-sh/nvm) to switch
+- Node 26.2.0 — use [fnm](https://github.com/Schniz/fnm) or [nvm](https://nvm-sh.github.io/nvm) to switch
 - pnpm — install once: `npm i -g pnpm`
 
 ## Setup
@@ -32,7 +32,7 @@ pnpm install
 pnpm dev
 ```
 
-This starts all five apps in parallel:
+This starts all six apps in parallel:
 
 | App | URL | Framework |
 |---|---|---|
@@ -42,6 +42,7 @@ This starts all five apps in parallel:
 | widget-trends | http://localhost:5003 | Svelte 5 |
 | widget-filter | http://localhost:5004 | Web Component |
 | widget-admin | http://localhost:5005 | React 19 |
+| fds-api (Consumer API) | http://localhost:5006 | Node.js http |
 
 Open http://localhost:5000 in your browser.
 
@@ -49,13 +50,14 @@ Open http://localhost:5000 in your browser.
 
 ### `/overview` — the main demo
 
-The shell fetches `discovery.local.json` at runtime, filters by permission, then calls `init()` and `loadRemote()` to mount each widget — no static imports.
+The shell calls the Consumer API at boot to resolve widget versions, filters by permission, then calls `init()` and `loadRemote()` to mount each widget — no static imports.
 
 - Filter widget (toolbar): Shadow DOM Web Component. Change the date range or segment.
 - KPI widget (main area): React. Responds to the filter — watch the numbers update.
 - Trends chart (sidebar): Svelte 5. Responds to the same filter — watch the chart redraw. This is cross-framework communication.
 - Version badges: each widget shows its own `package.json` version (e.g. `v1.0.0`), not the shell's.
 - Theme toggle (🌙 button): flips `data-theme` on `<html>`. All widgets — including the Shadow DOM filter — recolor via CSS custom properties.
+- Bucket chip (header): shows your current traffic bucket resolved by the Consumer API.
 
 ### Permission gating (`/admin`)
 
@@ -74,7 +76,7 @@ No rebuild. No widget change. Only the shell's mock user object changed.
 
 ### Traffic splitting (`?token=`)
 
-`widget-kpi` in `discovery.local.json` has two versions: v1.0.0 at 90% traffic and v1.1.0 at 10%. The shell hashes a user token against the active version URLs (djb2, 1–100 bucket) to deterministically select one. The resolved bucket is shown as a chip in the header.
+`widget-kpi` in `discovery.local.json` has two versions: v1.0.0 at 90% traffic and v1.1.0 at 10%. The Consumer API (running at :5006) selects one version server-side using the `selectVersion()` function from `@demo/contracts`. The shell receives a single-entry manifest and loads whatever URL it is handed.
 
 Two special tokens bypass the hash and force a specific cohort:
 - `http://localhost:5000?token=default` — bucket 1, always gets **v1.0.0** (the 90% version)
@@ -92,7 +94,7 @@ Any other token value is hashed deterministically — the same token always prod
    ```bash
    pnpm --filter widget-kpi build
    ```
-3. Update `discovery/discovery.local.json` to point `url` at the built `dist/` and bump `version`.
+3. Update `discovery.local.json` to point `url` at the built `dist/` and bump `version`.
 4. Reload the shell — the badge changes, nothing else moves, shell was never rebuilt.
 
 ### Environment swap (no rebuild)
@@ -108,13 +110,12 @@ The shell reads a different manifest — no code change, no rebuild.
 The only shared surface is `packages/contracts` (event names + manifest schema). Everything else is isolated.
 
 ```
-discovery/
-  discovery.local.json    ← runtime manifest (urls → localhost:500X/remoteEntry.js)
-  discovery.staging.json  ← same shape, placeholder CDN urls
+discovery.local.json    ← multi-version manifest (read by fds-api)
 packages/
-  contracts/              ← @demo/contracts: TOPICS + validateManifest()
+  contracts/              ← @demo/contracts: TOPICS + validateManifest() + djb2() + selectVersion()
 apps/
-  shell/                  ← React host, :5000 — fetches manifest, gates, init, renders slots
+  shell/                  ← React host, :5000 — calls Consumer API, gates, init, renders slots
+  fds-api/                ← Consumer API, :5006 — resolves versions, returns single-entry manifest
   widget-filter/          ← Web Component, :5004 — emits filter events
   widget-kpi/             ← React, :5001 — consumes filter events
   widget-trends/          ← Svelte 5, :5003 — consumes filter events

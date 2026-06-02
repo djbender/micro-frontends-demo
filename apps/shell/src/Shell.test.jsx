@@ -41,9 +41,10 @@ const GHOST_SLOT_MANIFEST = {
   },
 };
 
-function mockFetch(manifest) {
+function mockFetch(manifest, bucket = 42) {
   global.fetch = vi.fn().mockResolvedValue({
     json: vi.fn().mockResolvedValue(manifest),
+    headers: new Map([['X-Traffic-Bucket', String(bucket)]]),
   });
 }
 
@@ -201,45 +202,48 @@ describe('Shell', () => {
     unmount();
   });
 
-  it('selects the same version for the same token (deterministic)', async () => {
-    const splitManifest = {
+  it('loads the same remote when the server returns the same entry', async () => {
+    const singleManifest = {
       schema: SCHEMA,
       microFrontends: {
         'widget-kpi': [
-          { ...makeEntry('http://localhost:5001/remoteEntry.js', { slot: 'main', route: '/overview', requiredPermissions: ['dashboard.view'], version: '1.0.0' }), deployment: { default: true,  traffic: 90 } },
-          { ...makeEntry('http://localhost:5001/remoteEntry.js', { slot: 'main', route: '/overview', requiredPermissions: ['dashboard.view'], version: '1.1.0' }), deployment: { default: false, traffic: 10 } },
+          { ...makeEntry('http://localhost:5001/remoteEntry.js', { slot: 'main', route: '/overview', requiredPermissions: ['dashboard.view'], version: '1.0.0' }), deployment: { default: true, traffic: 90 } },
         ],
       },
     };
-    // Render twice with the same token — loadRemote should be called with the same remote both times
     for (let i = 0; i < 2; i++) {
       vi.clearAllMocks();
       loadRemote.mockResolvedValue({ mount: vi.fn().mockReturnValue(vi.fn()) });
-      mockFetch(splitManifest);
+      mockFetch(singleManifest);
       const { unmount } = await act(async () => render(<Shell currentUser={{ permissions: ['dashboard.view'] }} userToken="alice" />));
       screen.getByText('Overview');
       unmount();
     }
-    // Both renders called the same remote entry
     const calls = loadRemote.mock.calls.map(([name]) => name);
     expect(calls).toEqual(['widget-kpi_1_0_0/mount']);
   });
 
-  it('token="canary" always picks the minority version (bucket 100)', async () => {
+  it('loads the remote the server resolves for the given token', async () => {
     const v1Url = 'http://localhost:5001/v1/remoteEntry.js';
     const v2Url = 'http://localhost:5001/v2/remoteEntry.js';
-    const splitManifest = {
+    const canaryManifest = {
       schema: SCHEMA,
       microFrontends: {
         'widget-kpi': [
-          { url: v1Url, fallbackUrl: v1Url, metadata: { integrity: '', version: '1.0.0' }, deployment: { default: true,  traffic: 90 }, extras: { module: './mount', slot: 'main', route: '/overview', requiredPermissions: ['dashboard.view'] } },
           { url: v2Url, fallbackUrl: v2Url, metadata: { integrity: '', version: '1.1.0' }, deployment: { default: false, traffic: 10 }, extras: { module: './mount', slot: 'main', route: '/overview', requiredPermissions: ['dashboard.view'] } },
         ],
       },
     };
+    const defaultManifest = {
+      schema: SCHEMA,
+      microFrontends: {
+        'widget-kpi': [
+          { url: v1Url, fallbackUrl: v1Url, metadata: { integrity: '', version: '1.0.0' }, deployment: { default: true, traffic: 90 }, extras: { module: './mount', slot: 'main', route: '/overview', requiredPermissions: ['dashboard.view'] } }],
+      },
+    };
     const { init: mockInit } = await import('@module-federation/runtime');
 
-    mockFetch(splitManifest);
+    mockFetch(canaryManifest, 100);
     const { unmount: unmount1 } = await act(async () => render(<Shell currentUser={{ permissions: ['dashboard.view'] }} userToken="canary" />));
     screen.getByText('Overview');
     expect(mockInit.mock.calls.some(([cfg]) => cfg.remotes?.some(r => r.entry === v2Url))).toBe(true);
@@ -247,7 +251,7 @@ describe('Shell', () => {
 
     vi.clearAllMocks();
     loadRemote.mockResolvedValue({ mount: vi.fn().mockReturnValue(vi.fn()) });
-    mockFetch(splitManifest);
+    mockFetch(defaultManifest, 1);
     const { unmount: unmount2 } = await act(async () => render(<Shell currentUser={{ permissions: ['dashboard.view'] }} userToken="default" />));
     screen.getByText('Overview');
     expect(mockInit.mock.calls.some(([cfg]) => cfg.remotes?.some(r => r.entry === v1Url))).toBe(true);

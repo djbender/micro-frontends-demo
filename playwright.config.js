@@ -4,12 +4,12 @@ export default defineConfig({
   testDir: './e2e',
   fullyParallel: false,
   workers: 1,
-  retries: 1,
   timeout: 1000,
   use: {
     baseURL: 'http://localhost:5000',
   },
   webServer: [
+    { command: 'pnpm --filter fds-api dev', url: 'http://localhost:5006', reuseExistingServer: true },
     { command: 'pnpm --filter shell run preview', url: 'http://localhost:5000', reuseExistingServer: true },
     { command: 'pnpm --filter widget-kpi run preview', url: 'http://localhost:5001', reuseExistingServer: true },
     { command: 'pnpm --filter widget-kpi run preview:v1-1-0', url: 'http://localhost:5002', reuseExistingServer: true },

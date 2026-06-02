@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-# Start all 5 dev servers in parallel (ports 5000–5005)
+# Start all 6 dev servers in parallel (ports 5000–5006)
 pnpm dev
 
 # Build all apps sequentially
@@ -18,21 +18,24 @@ pnpm preview
 pnpm --filter shell dev
 pnpm --filter widget-kpi build
 pnpm --filter widget-trends dev
+pnpm --filter fds-api dev
 ```
 
 No linter or test suite is configured. There is no TypeScript — the codebase is plain JS + JSDoc throughout.
 
 ## Architecture
 
-This is a **runtime-composed micro-frontend dashboard**. The shell fetches a JSON manifest at boot, filters entries by user permissions, calls `init()` once with the allowed remotes, then calls `loadRemote()` per widget. Nothing is bundled together — each app is independently built and served.
+This is a **runtime-composed micro-frontend dashboard**. The shell calls a Consumer API at boot to resolve widget versions, filters entries by user permissions, calls `init()` once with the allowed remotes, then calls `loadRemote()` per widget. Nothing is bundled together — each app is independently built and served.
 
 ### Boot sequence (strictly ordered — RUNTIME-009)
 
 `apps/shell/src/main.jsx` runs this on mount:
-1. `fetch(DISCOVERY_URL)` → `validateManifest()` → fallback UI on failure
-2. Filter manifest entries by `currentUser.permissions`
-3. `await init({ remotes: allowed.map(m => ({ name, entry, type: 'module' })) })` — **must complete before any `loadRemote`**
-4. `loadRemote('<name>/mount')` per allowed widget, call `mod.mount(target, { bus })`
+1. Generate `userToken` (from `?token=` URL param or `crypto.randomUUID()`)
+2. `fetch(DISCOVERY_URL + '?token=' + token)` → Consumer API on port 5006
+3. API reads `discovery.local.json`, calls `selectVersion()` per MFE, returns single-entry manifest with `X-Traffic-Bucket` header
+4. Shell validates the resolved manifest, filters by `currentUser.permissions`
+5. `await init({ remotes: allowed.map(m => ({ name, entry, type: 'module' })) })` — **must complete before any `loadRemote`**
+6. `loadRemote('<name>/mount')` per allowed widget, call `mod.mount(target, { bus })`
 
 `type: 'module'` is required on every remote in `init()` — Vite dev remoteEntry.js files are ESM and will fail with RUNTIME-001 without it.
 
@@ -47,6 +50,7 @@ Every widget exposes `./mount` with the same signature: `mount(target, props) �
 | `widget-trends` | Svelte 5 | 5003 | `svelteMount(Component, { target, props })` |
 | `widget-filter` | Web Component | 5004 | `customElements.define` guard + `el.bus = props.bus` |
 | `widget-admin` | React 19 | 5005 | `createRoot(target).render(...)` (does not use `props.bus`) |
+| `fds-api` | Node.js http | 5006 | Consumer API (reads manifest, resolves versions) |
 
 ### Cross-widget communication
 
@@ -58,12 +62,20 @@ Via `EventTarget` bus — no global store, no shared package. Three events defin
 
 Widgets MAY import `TOPICS` from `@demo/contracts` or use string literals.
 
+### Consumer API ( fds-api )
+
+`apps/fds-api/server.js` implements the FDS Consumer API. It reads `discovery.local.json` on every request, calls `selectVersion()` per MFE, and returns a resolved manifest with single-entry arrays. The shell never sees multiple versions.
+
+- `GET /microFrontends?token=<t>` — resolves versions, returns `X-Traffic-Bucket` header
+- `Access-Control-Expose-Headers: X-Traffic-Bucket` — allows the shell to read the bucket for display
+- Manifest path via `ADMIN_MANIFEST_PATH` env var (default: `../../apps/shell/public/discovery.local.json`)
+
 ### Discovery manifest
 
-`apps/shell/public/discovery.local.json` is the local dev manifest served by the shell's static file server. Override via `VITE_DISCOVERY_URL` env var (no rebuild needed — swap to staging/CDN). Schema aligns with the [AWS Frontend Discovery Service](https://github.com/awslabs/frontend-discovery-service) (`schema/v1-pre.json`):
+`apps/shell/public/discovery.local.json` is the local dev manifest with full multi-version data. The fds-api reads this file. Override via `VITE_DISCOVERY_URL` env var (no rebuild needed — swap to staging/CDN Consumer API). Schema aligns with the [AWS Frontend Discovery Service](https://github.com/awslabs/frontend-discovery-service) (`schema/v1-pre.json`):
 
 - Top level: `schema` (URL string) + `microFrontends` (object keyed by widget name)
-- Each key holds an array of version entries; the shell uses traffic splitting to select one (see below)
+- Each key holds an array of version entries with traffic percentages
 - Each entry: `url`, optional `fallbackUrl`, `metadata.integrity` (empty string in dev), `metadata.version`, `deployment.{ default, traffic }`
 - Project-specific fields (`module`, `slot`, `route`, `requiredPermissions`) live in `extras`
 
@@ -71,13 +83,14 @@ If `fallbackUrl` differs from `url` and `loadRemote` throws, the shell re-inits 
 
 ### Traffic splitting
 
-The shell implements client-side traffic splitting per the FDS spec. Version selection algorithm:
+Version selection is **server-side** via the Consumer API. The `selectVersion()` function (exported from `@demo/contracts`) is used by the API:
 
-1. Hash `userToken + versionUrls` with djb2 → bucket (1–100)
-2. Walk versions in order, accumulate `deployment.traffic` until bucket is covered — that version wins
-3. On any error, fall back to the entry where `deployment.default === true`
+1. `token=default` → bucket 1 (majority version)
+2. `token=canary` → bucket 100 (minority version)
+3. Otherwise: hash `userToken + versionUrls` with djb2 → bucket (1–100), walk versions accumulating `deployment.traffic` until bucket is covered
+4. On any error, fall back to the entry where `deployment.default === true`
 
-`userToken` comes from `?token=<value>` URL param (falls back to `crypto.randomUUID()` per session). The resolved bucket is shown as a chip in the shell header. Two special tokens bypass the hash: `token=default` forces bucket 1 (majority version), `token=canary` forces bucket 100 (minority version). All other values are hashed normally. `widget-kpi` in `discovery.local.json` demonstrates a 90/10 split — `?token=default` gets v1.0.0, `?token=canary` gets v1.1.0.
+`userToken` comes from `?token=<value>` URL param (falls back to `crypto.randomUUID()` per session). The resolved bucket is returned via `X-Traffic-Bucket` header and shown as a chip in the shell header. `widget-kpi` in `discovery.local.json` demonstrates a 90/10 split.
 
 ### Permission gating
 

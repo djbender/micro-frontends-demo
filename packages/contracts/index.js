@@ -57,3 +57,24 @@ export function validateManifest(json) {
   }
   return { valid: true };
 }
+
+export function djb2(str) {
+  let hash = 5381;
+  for (let i = 0; i < str.length; i++)
+    hash = ((hash << 5) + hash) ^ str.charCodeAt(i);
+  return (hash >>> 0) % 100 + 1;
+}
+
+export function selectVersion(versions, userToken) {
+  try {
+    const bucket = userToken === 'default' ? 1
+      : userToken === 'canary' ? 100
+      : djb2(userToken + versions.map(v => v.url).join('|'));
+    let cumulative = 0;
+    for (const v of versions) {
+      cumulative += v.deployment.traffic;
+      if (bucket <= cumulative) return v;
+    }
+  } catch (_) { /* fall through to default */ }
+  return versions.find(v => v.deployment.default) ?? versions[0];
+}
