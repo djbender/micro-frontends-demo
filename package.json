@@ -25,6 +25,6 @@
     "@vitest/coverage-v8": "^4.1.7",
     "concurrently": "^10.0.0",
     "oxlint": "^1.68.0",
-    "vitest": "^4.1.7"
+    "vitest": "^4.1.8"
   }
 }
