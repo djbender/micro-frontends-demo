@@ -202,6 +202,16 @@ describe('Shell', () => {
     unmount();
   });
 
+  it('shows no bucket chip when X-Traffic-Bucket header is absent', async () => {
+    global.fetch = vi.fn().mockResolvedValue({
+      json: vi.fn().mockResolvedValue(BASE_MANIFEST),
+      headers: new Map(),
+    });
+    loadRemote.mockResolvedValue({ mount: vi.fn().mockReturnValue(vi.fn()) });
+    await act(async () => { render(<Shell currentUser={{ permissions: ['dashboard.view'] }} />); });
+    expect(document.querySelector('.traffic-chip')).not.toBeInTheDocument();
+  });
+
   it('loads the same remote when the server returns the same entry', async () => {
     const singleManifest = {
       schema: SCHEMA,

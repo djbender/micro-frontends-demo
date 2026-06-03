@@ -66,15 +66,22 @@ export function djb2(str) {
 }
 
 export function selectVersion(versions, userToken) {
-  try {
-    const bucket = userToken === 'default' ? 1
-      : userToken === 'canary' ? 100
-      : djb2(userToken + versions.map(v => v.url).join('|'));
-    let cumulative = 0;
-    for (const v of versions) {
-      cumulative += v.deployment.traffic;
-      if (bucket <= cumulative) return v;
-    }
-  } catch (_) { /* fall through to default */ }
-  return versions.find(v => v.deployment.default) ?? versions[0];
+  let bucket;
+  if (userToken === 'default') {
+    bucket = 1;
+  } else if (userToken === 'canary') {
+    bucket = 100;
+  } else {
+    bucket = djb2(userToken + versions.map(v => v.url).join('|'));
+  }
+  let cumulative = 0;
+  for (const v of versions) {
+    cumulative += v.deployment.traffic;
+    if (bucket <= cumulative) return v;
+  }
+  for (const v of versions) {
+    /* c8 ignore next -- v8 doesn't track branches of `if` inside `for...of` loops that follow another `for...of` */
+    if (v.deployment.default) return v;
+  }
+  return versions[0];
 }

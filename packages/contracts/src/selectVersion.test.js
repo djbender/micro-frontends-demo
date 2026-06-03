@@ -58,6 +58,14 @@ describe('selectVersion', () => {
     expect(selectVersion([nonDefault], 'any-token')).toBe(nonDefault);
   });
 
+  it('returns versions[0] via ?? fallback when no default exists and bucket misses all ranges', () => {
+    const v1 = { ...validEntry, metadata: { ...validEntry.metadata, version: '1.0.0' }, deployment: { default: false, traffic: 0 } };
+    const v2 = { ...validEntry, metadata: { ...validEntry.metadata, version: '1.1.0' }, deployment: { default: false, traffic: 0 } };
+    // Both have 0% traffic so the loop never matches any bucket; no default exists either
+    // so ?? versions[0] is the final fallback
+    expect(selectVersion([v1, v2], 'any-token')).toBe(v1);
+  });
+
   it('selects based on traffic percentages for non-special tokens', () => {
     const results = new Set();
     for (let i = 0; i < 200; i++) {
