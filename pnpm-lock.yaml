@@ -44,10 +44,10 @@ importers:
         version: 2.5.0
       react:
         specifier: ^19
-        version: 19.2.6
+        version: 19.2.7
       react-dom:
         specifier: ^19
-        version: 19.2.6(react@19.2.6)
+        version: 19.2.6(react@19.2.7)
     devDependencies:
       '@module-federation/vite':
         specifier: ^1.16
@@ -57,7 +57,7 @@ importers:
         version: 6.9.1
       '@testing-library/react':
         specifier: ^16.3.2
-        version: 16.3.2(@testing-library/dom@10.4.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+        version: 16.3.2(@testing-library/dom@10.4.1)(react-dom@19.2.6(react@19.2.7))(react@19.2.7)
       '@vitejs/plugin-react':
         specifier: ^6
         version: 6.0.2(vite@8.0.14(@types/node@25.9.1))
@@ -78,10 +78,10 @@ importers:
         version: link:../../packages/contracts
       react:
         specifier: ^19
-        version: 19.2.6
+        version: 19.2.7
       react-dom:
         specifier: ^19
-        version: 19.2.6(react@19.2.6)
+        version: 19.2.6(react@19.2.7)
     devDependencies:
       '@module-federation/vite':
         specifier: ^1.16
@@ -91,7 +91,7 @@ importers:
         version: 6.9.1
       '@testing-library/react':
         specifier: ^16.3.2
-        version: 16.3.2(@testing-library/dom@10.4.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+        version: 16.3.2(@testing-library/dom@10.4.1)(react-dom@19.2.6(react@19.2.7))(react@19.2.7)
       '@vitejs/plugin-react':
         specifier: ^6
         version: 6.0.2(vite@8.0.14(@types/node@25.9.1))
@@ -134,10 +134,10 @@ importers:
         version: link:../../packages/contracts
       react:
         specifier: ^19
-        version: 19.2.6
+        version: 19.2.7
       react-dom:
         specifier: ^19
-        version: 19.2.6(react@19.2.6)
+        version: 19.2.6(react@19.2.7)
     devDependencies:
       '@module-federation/vite':
         specifier: ^1.16
@@ -147,7 +147,7 @@ importers:
         version: 6.9.1
       '@testing-library/react':
         specifier: ^16.3.2
-        version: 16.3.2(@testing-library/dom@10.4.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+        version: 16.3.2(@testing-library/dom@10.4.1)(react-dom@19.2.6(react@19.2.7))(react@19.2.7)
       '@vitejs/plugin-react':
         specifier: ^6
         version: 6.0.2(vite@8.0.14(@types/node@25.9.1))
@@ -1077,8 +1077,8 @@ packages:
   react-is@17.0.2:
     resolution: {integrity: sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==}
 
-  react@19.2.6:
-    resolution: {integrity: sha512-sfWGGfavi0xr8Pg0sVsyHMAOziVYKgPLNrS7ig+ivMNb3wbCBw3KxtflsGBAwD3gYQlE/AEZsTLgToRrSCjb0Q==}
+  react@19.2.7:
+    resolution: {integrity: sha512-HNe9WslTbXmFK8o8cmwgAeJFSBvt1bPdHCVKtaaV+WlAN36mpT4hcRpwbf3fY56ar2oIXzsBpOAiIRHAdY0OlQ==}
     engines: {node: '>=0.10.0'}
 
   redent@3.0.0:
@@ -1622,12 +1622,12 @@ snapshots:
       picocolors: 1.1.1
       redent: 3.0.0
 
-  '@testing-library/react@16.3.2(@testing-library/dom@10.4.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
+  '@testing-library/react@16.3.2(@testing-library/dom@10.4.1)(react-dom@19.2.6(react@19.2.7))(react@19.2.7)':
     dependencies:
       '@babel/runtime': 7.29.7
       '@testing-library/dom': 10.4.1
-      react: 19.2.6
-      react-dom: 19.2.6(react@19.2.6)
+      react: 19.2.7
+      react-dom: 19.2.6(react@19.2.7)
 
   '@testing-library/svelte-core@1.0.0(svelte@5.56.1)':
     dependencies:
@@ -2059,14 +2059,14 @@ snapshots:
       ansi-styles: 5.2.0
       react-is: 17.0.2
 
-  react-dom@19.2.6(react@19.2.6):
+  react-dom@19.2.6(react@19.2.7):
     dependencies:
-      react: 19.2.6
+      react: 19.2.7
       scheduler: 0.27.0
 
   react-is@17.0.2: {}
 
-  react@19.2.6: {}
+  react@19.2.7: {}
 
   redent@3.0.0:
     dependencies:
