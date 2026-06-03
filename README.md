@@ -16,7 +16,7 @@ A runtime-composed micro-frontend dashboard that visibly proves four things:
 
 ```bash
 # 1. Clone and enter the repo
-git clone <repo-url> mfe-demo && cd mfe-demo
+git clone <repo-url> micro-frontends-demo && cd micro-frontends-demo
 
 # 2. Use the correct Node version
 fnm use   # reads .node-version (26.2.0)

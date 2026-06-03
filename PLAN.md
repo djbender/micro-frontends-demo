@@ -63,7 +63,7 @@ per-route widget sets are derived from the manifest, never hardcoded.
 
 ## Repo structure (built subset)
 ```
-mfe-demo/
+micro-frontends-demo/
   package.json              # workspace root: dev / build / preview scripts + engines: node 26.2.0
   pnpm-workspace.yaml
   .node-version             # 26.2.0
