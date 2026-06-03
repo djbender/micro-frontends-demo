@@ -222,7 +222,7 @@ export default function Shell({ currentUser = DEFAULT_USER, userToken = null }) 
             <h3>Independent Versioning &amp; Zero-Downtime Deploy</h3>
             <p>
               Each widget carries its own <code>package.json</code> version, exposed at runtime
-              as <code>__WIDGET_VERSION__</code> and shown in its version badge. Rebuilding and
+              as <code>import.meta.env.VITE_WIDGET_VERSION</code> and shown in its version badge. Rebuilding and
               redeploying one widget — then updating its URL in the manifest — is enough to ship
               it. The shell and every other widget keep running without a rebuild or restart.{' '}
               <em>Teams release on their own schedule; a single widget deploy never risks the rest of the dashboard.</em>

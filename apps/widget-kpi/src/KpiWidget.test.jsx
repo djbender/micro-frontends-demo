@@ -81,6 +81,12 @@ describe('KpiWidget', () => {
     vi.restoreAllMocks();
   });
 
+  it('renders version badge with injected version', () => {
+    const bus = makeBus();
+    render(<KpiWidget bus={bus} />);
+    expect(screen.getByText('vtest')).toBeInTheDocument();
+  });
+
   it('removes FILTER_CHANGE listener on unmount', () => {
     const bus = makeBus();
     const spy = vi.spyOn(bus, 'removeEventListener');

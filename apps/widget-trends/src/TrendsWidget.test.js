@@ -74,6 +74,12 @@ describe('TrendsWidget', () => {
     expect(document.querySelector('svg[aria-label="Trends chart"]')).toBeInTheDocument();
   });
 
+  it('renders version badge with injected version', () => {
+    const bus = makeBus();
+    render(TrendsWidget, { props: { bus } });
+    expect(screen.getByText('vtest')).toBeInTheDocument();
+  });
+
   it('removes FILTER_CHANGE listener on destroy', () => {
     const bus = makeBus();
     const spy = vi.spyOn(bus, 'removeEventListener');

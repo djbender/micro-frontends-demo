@@ -88,6 +88,13 @@ describe('mount()', () => {
     expect(received[0].segment).toBe('all');
   });
 
+  it('renders version badge with injected version', () => {
+    const bus = makeBus();
+    mount(container, { bus });
+    const badge = container.querySelector('filter-widget').shadowRoot.querySelector('.version-badge');
+    expect(badge.textContent).toBe('vtest');
+  });
+
   it('changing segment select emits FILTER_CHANGE with new segment', () => {
     const bus = makeBus();
     mount(container, { bus });

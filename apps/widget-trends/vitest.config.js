@@ -3,7 +3,7 @@ import { svelte } from '@sveltejs/vite-plugin-svelte';
 
 export default defineConfig({
   plugins: [svelte()],
-  define: { __WIDGET_VERSION__: JSON.stringify('test') },
+  define: { 'import.meta.env.VITE_WIDGET_VERSION': JSON.stringify('test') },
   resolve: {
     conditions: ['browser'],
   },

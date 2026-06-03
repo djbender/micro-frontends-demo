@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
-  define: { __WIDGET_VERSION__: JSON.stringify('test') },
+  define: { 'import.meta.env.VITE_WIDGET_VERSION': JSON.stringify('test') },
   test: {
     environment: 'happy-dom',
     globals: true,

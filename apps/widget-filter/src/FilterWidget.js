@@ -114,7 +114,7 @@ class FilterWidget extends HTMLElement {
       <div class="widget">
         <div class="filter-header">
           <h2 class="filter-title">Filters</h2>
-          <span class="version-badge">v${__WIDGET_VERSION__}</span>
+          <span class="version-badge">v${import.meta.env.VITE_WIDGET_VERSION}</span>
         </div>
         <div class="filter-bar">
           <span class="filter-label">Date Range</span>

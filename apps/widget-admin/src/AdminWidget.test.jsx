@@ -36,4 +36,9 @@ describe('AdminWidget', () => {
   it('does not crash when rendered without props', () => {
     expect(() => render(<AdminWidget />)).not.toThrow();
   });
+
+  it('renders version badge with injected version', () => {
+    render(<AdminWidget />);
+    expect(screen.getByText('vtest')).toBeInTheDocument();
+  });
 });

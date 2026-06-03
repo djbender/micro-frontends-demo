@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from 'vitest';
-import { selectVersion, djb2 } from '@demo/contracts';
+import { describe, it, expect } from 'vitest';
+import { selectVersion } from '@demo/contracts';
 
 const validEntry = {
   url: 'http://localhost:5001/remoteEntry.js',

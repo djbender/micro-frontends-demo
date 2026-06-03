@@ -17,7 +17,7 @@ export default defineConfig({
     }),
   ],
   define: {
-    __WIDGET_VERSION__: JSON.stringify(pkg.version),
+    'import.meta.env.VITE_WIDGET_VERSION': JSON.stringify(pkg.version),
   },
   server: {
     port: 5003,
