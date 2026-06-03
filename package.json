@@ -2,6 +2,7 @@
   "name": "micro-frontends-demo",
   "private": true,
   "version": "0.0.1",
+  "packageManager": "pnpm@11.5.0",
   "engines": {
     "node": "26.2.0"
   },
