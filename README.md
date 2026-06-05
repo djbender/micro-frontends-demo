@@ -1,11 +1,22 @@
 # MFE Dashboard Demo
 
-A runtime-composed micro-frontend dashboard that visibly proves four things:
+A runtime-composed micro-frontend dashboard demonstrating eight micro-frontend patterns:
 
-1. Independent deploy/versioning — rebuild and redeploy one widget without touching the shell.
-2. Cross-framework communication — React, Svelte 5, and a Web Component talk across framework boundaries via a native `EventTarget` bus.
-3. Shared look, isolated styles — one consistent theme, no style leakage, no shared dependency.
-4. Server-side traffic splitting & canary deploys — the Consumer API resolves widget versions server-side, returning a single-entry manifest with no client-side selection logic.
+1. **Runtime Composition via Discovery Manifest** — the shell fetches a JSON manifest at boot and resolves every widget URL at runtime. Nothing is bundled together at build time; swapping a widget's URL in the manifest redeploys it without touching the shell or any other widget.
+
+2. **Universal Mount Contract** — every widget exposes one Module Federation module (`./mount`) with the same signature: `mount(target, props) → unmount`. The shell calls this single function and never knows whether the widget underneath is React, Svelte, or a Web Component. Teams choose their own stack; adding a new framework requires zero changes to the shell.
+
+3. **Event Bus for Cross-Framework Communication** — the shell creates one `EventTarget` and injects it into every widget at mount. Widgets communicate via Custom Events (`dashboard:filter-change`, `dashboard:request-filter`) with no global store, no shared package, and no coupling between implementations.
+
+4. **Late-Mount Handshake (Request/Reply)** — when a consumer mounts after the filter has already emitted its initial state, it fires `dashboard:request-filter` and the filter widget re-emits its current selection. No state is cached on the bus; mount order is irrelevant and widgets can load lazily or in parallel without missing events.
+
+5. **Permission Gating at the Manifest Layer** — the shell filters the manifest by `requiredPermissions` before calling `init()`. A widget the current user cannot access is never registered, never fetched, and never mounted — the route and nav entry simply do not appear.
+
+6. **Traffic Splitting & Canary Deploys** — the manifest carries multiple versions of a widget with a `deployment.traffic` percentage each. The Consumer API selects one version server-side; the shell receives a single-entry manifest and never sees multiple versions. Ship a new widget version to 10% of users with zero infrastructure change — just update the manifest.
+
+7. **Independent Versioning & Zero-Downtime Deploy** — each widget carries its own `package.json` version, exposed at runtime as `import.meta.env.VITE_WIDGET_VERSION` and shown in its version badge. Rebuilding and redeploying one widget — then updating its URL in the manifest — is enough to ship it. The shell and every other widget keep running without a rebuild or restart.
+
+8. **Shared Tokens, Isolated Styles** — design tokens are CSS custom properties on `:root`. Every widget reads the same token names without importing a shared CSS file. The Web Component uses Shadow DOM, yet custom properties pierce the shadow boundary automatically. Consistent theming across all frameworks with zero style leakage.
 
 ## Requirements
 
