@@ -5,13 +5,13 @@ test.describe('version traffic splitting', () => {
     await page.goto('/?token=default');
     await expect(page.locator('[data-slot="main"]').getByText('KPI Summary')).toBeVisible();
     await expect(page.locator('.traffic-chip')).toHaveText('bucket 1');
-    await expect(page.locator('[data-slot="main"]').getByText('v1.0.0')).toBeVisible();
+    await expect(page.locator('[data-slot="main"]').getByText('widget-kpi: 1.0.0')).toBeVisible();
   });
 
   test('canary token shows bucket 100 chip and KPI v1.1.0', async ({ page }) => {
     await page.goto('/?token=canary');
     await expect(page.locator('[data-slot="main"]').getByText('KPI Summary')).toBeVisible();
     await expect(page.locator('.traffic-chip')).toHaveText('bucket 100');
-    await expect(page.locator('[data-slot="main"]').getByText('v1.1.0')).toBeVisible();
+    await expect(page.locator('[data-slot="main"]').getByText('widget-kpi: 1.1.0')).toBeVisible();
   });
 });

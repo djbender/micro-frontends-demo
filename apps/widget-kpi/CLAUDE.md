@@ -74,14 +74,14 @@ Build output directories are version-scoped: `dist/v1-0-0/` and `dist/v1-1-0/`. 
 - **`base` is an absolute URL** (`http://localhost:5001/` and `http://localhost:5002/`) — this is required so Module Federation asset resolution works correctly when both remote servers run at once. Do not change to a relative base.
 - **`react`/`react-dom` are `singleton: true`** in both versioned configs. Singleton sharing requires the shell to also declare them as singletons — which it does. Do not remove this from the widget configs.
 - **KPI data is entirely synthetic** — `src/data.js` hardcodes base values and multipliers. The change percentage is always ~7.53% positive (`prev = value * 0.93`) regardless of filter.
-- **`vitest.config.js` uses `define: { 'import.meta.env.VITE_WIDGET_VERSION': JSON.stringify('test') }`** — consistent with the Vite build configs. The badge renders `vtest` in tests and is now asserted.
+- **`vitest.config.js` uses `define: { 'import.meta.env.VITE_WIDGET_VERSION': JSON.stringify('test') }`** — consistent with the Vite build configs. The badge renders `widget-kpi: test` in tests and is now asserted.
 - **`discovery.local.json` shows a 90/10 traffic split** for this widget — v1.0.0 gets 90%, v1.1.0 gets 10%. Traffic assignment is server-side in `fds-api`; the widget itself has no awareness of versioning at runtime.
 
 ## Tests
 
 Three test files run under Vitest with the `happy-dom` environment and `globals: true`:
 
-`src/KpiWidget.test.jsx` (9 cases): renders 4 KPI cards, heading presence, `dashboard:request-filter` dispatch on mount, revenue value update when `dashboard:filter-change` fires (30d→7d: `$482.0k`→`$120.5k`), `dashboard:event-consumed` ack shape (`actor`, `topic`, `payload`), positive ▲ indicators for all 4 KPIs, negative ▼ indicator via mocked `computeKpis`, version badge renders `vtest`, and listener removal on unmount.
+`src/KpiWidget.test.jsx` (9 cases): renders 4 KPI cards, heading presence, `dashboard:request-filter` dispatch on mount, revenue value update when `dashboard:filter-change` fires (30d→7d: `$482.0k`→`$120.5k`), `dashboard:event-consumed` ack shape (`actor`, `topic`, `payload`), positive ▲ indicators for all 4 KPIs, negative ▼ indicator via mocked `computeKpis`, version badge renders `widget-kpi: test`, and listener removal on unmount.
 
 `src/data.test.js` (18 cases): `computeKpis` shape, key order, change always ~7.53%, range multipliers (7d=0.25×, 90d=2.8×, ytd=9.1×), segment multipliers (enterprise=0.4×, smb=0.38×, consumer=0.22×), unknown key fallbacks, default args. `formatValue` edge cases for `$`/`%`/count units including the 1000 boundary.
 

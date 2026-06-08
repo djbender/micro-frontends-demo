@@ -29,7 +29,7 @@ pnpm --filter widget-trends exec vitest run src/data.test.js
 pnpm --filter widget-trends exec vitest run -t "dispatches dashboard:event-consumed"
 ```
 
-ESM only (`"type": "module"`). No TypeScript — plain JS + Svelte 5 SFCs. Tests run under Vitest with the `happy-dom` environment and `globals: true` — no per-file import of `describe`/`it`/`expect` needed (configured in `vitest.config.js`, DOM matchers set up in `src/test/setup.js`). The vitest config sets `import.meta.env.VITE_WIDGET_VERSION` to `'test'` via `define` so the badge renders `vtest` in tests.
+ESM only (`"type": "module"`). No TypeScript — plain JS + Svelte 5 SFCs. Tests run under Vitest with the `happy-dom` environment and `globals: true` — no per-file import of `describe`/`it`/`expect` needed (configured in `vitest.config.js`, DOM matchers set up in `src/test/setup.js`). The vitest config sets `import.meta.env.VITE_WIDGET_VERSION` to `'test'` via `define` so the badge renders `widget-trends: test` in tests.
 
 ## What this is
 
@@ -61,7 +61,7 @@ ESM only (`"type": "module"`). No TypeScript — plain JS + Svelte 5 SFCs. Tests
 - **Port 5003 is hardcoded** in `vite.config.js` (`server.port`, `server.origin`, `base`) and in the `preview` script — three places to keep in sync.
 - **`base: 'http://localhost:5003/'`** is an absolute URL so the shell resolves federated assets correctly. Do not change to a relative base without understanding federation asset resolution.
 - **`shared: {}`** in the federation config is intentional — `widget-trends` shares no dependencies with the host. React must NOT appear here (see root CLAUDE.md).
-- **`import.meta.env.VITE_WIDGET_VERSION`** is set via `define` in `vite.config.js` (sourced from `package.json` version). All four widgets share this interface — see root CLAUDE.md for rationale. The vitest config sets it to `'test'`; the badge renders `vtest` and is now asserted.
+- **`import.meta.env.VITE_WIDGET_VERSION`** is set via `define` in `vite.config.js` (sourced from `package.json` version). All four widgets share this interface — see root CLAUDE.md for rationale. The vitest config sets it to `'test'`; the badge renders `widget-trends: test` and is now asserted.
 - **`90d` and `ytd` date ranges both return 30 points** — `RANGE_POINTS` caps both at 30, which is the SEED array length. There are no actual date calculations; all data is synthetic.
 - **`SEGMENT_SCALE` has four known keys** (`all`, `enterprise`, `smb`, `consumer`). Any unrecognized segment falls back to scale `1` (same as `all`) via `?? 1` — it does not throw.
 - **`dev.js` is not tested** — it is a thin standalone harness that mounts the widget into `#root` for isolated browser development (`vite` dev server without the shell). It is not referenced in the production federation build.
@@ -72,7 +72,7 @@ ESM only (`"type": "module"`). No TypeScript — plain JS + Svelte 5 SFCs. Tests
 Four test files, all under Vitest + happy-dom + `@testing-library/svelte`:
 
 - **`src/data.test.js`** (12 cases): covers all `dateRange` values (`7d`, `30d`, `90d`, `ytd`, unknown fallback), all `SEGMENT_SCALE` multipliers, point shape `{ i, value }`, index correctness, and unknown-segment fallback.
-- **`src/TrendsWidget.test.js`** (9 cases): covers initial render (heading, footer, SVG), `dashboard:request-filter` dispatch on mount, `dashboard:event-consumed` ack shape and detail payload when `FILTER_CHANGE` fires, footer text update after filter change, version badge renders `vtest`, and listener removal on destroy.
+- **`src/TrendsWidget.test.js`** (9 cases): covers initial render (heading, footer, SVG), `dashboard:request-filter` dispatch on mount, `dashboard:event-consumed` ack shape and detail payload when `FILTER_CHANGE` fires, footer text update after filter change, version badge renders `widget-trends: test`, and listener removal on destroy.
 - **`src/TrendsChart.test.js`** (5 cases): covers empty state ("No data"), default-prop empty array, single-point rendering (one circle, no paths), multi-point rendering (area + line paths + two endpoint circles).
 - **`src/test/mount.contract.test.js`** (4 cases): contract tests for the `mount` export — returns a function, appends content to target, unmount clears the DOM, bus events after unmount do not throw.
 

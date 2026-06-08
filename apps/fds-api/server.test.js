@@ -6,7 +6,7 @@ const validEntry = {
   fallbackUrl: 'http://localhost:5001/remoteEntry.js',
   metadata: { integrity: '', version: '1.0.0' },
   deployment: { default: true, traffic: 90 },
-  extras: { module: './mount', slot: 'main', route: '/overview', requiredPermissions: ['dashboard.view'] },
+  extras: { module: './mount', slots: [{ slot: 'main' }], route: '/overview', requiredPermissions: ['dashboard.view'] },
 };
 
 const v2Entry = {

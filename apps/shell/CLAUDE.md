@@ -49,14 +49,14 @@ Source is small: `src/main.jsx` (bootstrap), `src/Shell.jsx` (all host logic —
 2. `fetch(DISCOVERY_URL + '?token=' + encoded)` — `DISCOVERY_URL = import.meta.env.VITE_DISCOVERY_URL ?? 'http://localhost:5006/microFrontends'`.
 3. `validateManifest(json)` from `@demo/contracts`; throw on invalid.
 4. Read `X-Traffic-Bucket` response header.
-5. Filter `manifest.microFrontends`: take `versions[0]`, read `extras.{module,slot,route,requiredPermissions}`, skip the entry unless `requiredPermissions.every(p => currentUser.permissions.includes(p))`. Build `remoteName = \`${name}_${version.replace(/\./g,'_')}\``.
+5. Filter `manifest.microFrontends`: take `versions[0]`, read `extras.{module,slots,route,requiredPermissions}`, skip the entry unless `requiredPermissions.every(p => currentUser.permissions.includes(p))`. Build `remoteName = \`${name}_${version.replace(/\./g,'_')}\`` and `placements = slots.map(s => ({ slot: s.slot, variant: s.variant ?? 'full' }))`.
 6. `await init({ name: 'shell', remotes: allowed.map(m => ({ name: m.remoteName, entry: m.url, type: 'module' })) })`.
 7. `Object.groupBy(allowed, m => m.route)` → `byRouteRef`; set nav routes and `trafficInfo`.
 
 Per-route render (`renderRoute`, `useCallback`):
 1. Set an `abort = Symbol()` guard, `teardown()` previous mounts.
 2. For each mfe on the route: `loadRemote(\`${remoteName}/${module.replace('./','')}\`)`. On throw, if `fallbackUrl` exists and differs from `url`, re-`init()` that one remote with the fallback entry and retry `loadRemote` once.
-3. Find `document.querySelector('[data-slot="<slot>"]')`; `continue` if absent. Append a wrapper div, `mod.mount(wrapper, { bus })`, push `() => { unmount?.(); wrapper.remove() }` onto `unmountsRef`.
+3. Load the remote **once**, then for each `placement` in `mfe.placements`: find `document.querySelector('[data-slot="<slot>"]')`; `continue` if absent. Append a wrapper div, `mod.mount(wrapper, { bus, variant })`, push `() => { unmount?.(); wrapper.remove() }` onto `unmountsRef`. A widget with multiple placements (e.g. `widget-filter` full + mini) is loaded once and mounted per slot, so module-scope state in the widget is shared across slots — keep `loadRemote` above the placement loop.
 
 ## Note
 

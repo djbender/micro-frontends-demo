@@ -12,7 +12,7 @@ export default function AdminWidget() {
     <div className={styles.widget}>
       <div className={styles.header}>
         <h2 className={styles.title}>Admin Panel</h2>
-        <span className={styles.badge}>v{import.meta.env.VITE_WIDGET_VERSION}</span>
+        <span className={styles.badge}>widget-admin: {import.meta.env.VITE_WIDGET_VERSION}</span>
       </div>
       <p className={styles.subtitle}>Permission: <code>dashboard.admin</code></p>
       <table className={styles.table}>

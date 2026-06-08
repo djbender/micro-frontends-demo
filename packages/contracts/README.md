@@ -27,7 +27,7 @@ Checks performed:
 - `schema` is a non-empty string
 - `microFrontends` is an object (not array)
 - Each widget has a non-empty array of entries
-- Every entry has `url`, `metadata.integrity`, `metadata.version`, `extras.slot`, `extras.route`, `extras.requiredPermissions` (array), `deployment.traffic` (number), `deployment.default` (boolean)
+- Every entry has `url`, `metadata.integrity`, `metadata.version`, `extras.slots` (non-empty array of `{ slot, variant? }`), `extras.route`, `extras.requiredPermissions` (array), `deployment.traffic` (number), `deployment.default` (boolean)
 - Multi-version widgets: traffic percentages sum to exactly 100
 
 ```js

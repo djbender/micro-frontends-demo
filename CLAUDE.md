@@ -62,6 +62,14 @@ Via `EventTarget` bus — no global store, no shared package. Three events defin
 
 Widgets MAY import `TOPICS` from `@demo/contracts` or use string literals.
 
+### Single MFE in multiple slots (shared module-scope store)
+
+`widget-filter` is mounted **twice** from one manifest entry: a `full` interactive bar in the `toolbar` slot and a compact read-only `mini` mirror in the `side` slot (below `widget-trends`). The two copies stay in sync via a **module-scope store** (`apps/widget-filter/src/store.js`), *not* the bus.
+
+This works because Module Federation evaluates the remote's `./mount` graph **once** — the shell calls `loadRemote` a single time per remote, then `mod.mount()` per placement (`Shell.jsx` `renderRoute`). So `store.js` is one singleton shared by every mount. `store.setFilter()` notifies all subscribed copies (internal self-sync) **and** emits `FILTER_CHANGE` on the bus exactly once (external broadcast to kpi/trends). The echo guard is structural: the bus is dispatched only inside the store, never per-instance.
+
+Constraint: the placements must share one `remoteName` (same widget+version) so there is exactly one module evaluation. Splitting a second copy into a separate remote key would create a second store and break sync. The shell mounts in manifest key order, so `widget-filter` is ordered after `widget-trends` to make its `side`/`mini` copy render below the chart.
+
 ### Consumer API ( fds-api )
 
 `apps/fds-api/server.js` implements the FDS Consumer API. It reads `discovery.local.json` on every request, calls `selectVersion()` per MFE, and returns a resolved manifest with single-entry arrays. The shell never sees multiple versions.
@@ -77,7 +85,7 @@ Widgets MAY import `TOPICS` from `@demo/contracts` or use string literals.
 - Top level: `schema` (URL string) + `microFrontends` (object keyed by widget name)
 - Each key holds an array of version entries with traffic percentages
 - Each entry: `url`, optional `fallbackUrl`, `metadata.integrity` (empty string in dev), `metadata.version`, `deployment.{ default, traffic }`
-- Project-specific fields (`module`, `slot`, `route`, `requiredPermissions`) live in `extras`
+- Project-specific fields (`module`, `slots`, `route`, `requiredPermissions`) live in `extras`. `extras.slots` is a non-empty array of `{ slot, variant? }` — one entry per DOM slot the widget mounts into (`variant` defaults to `'full'`). A widget with multiple `slots` entries is loaded once and mounted into each slot (see "Single MFE in multiple slots" below).
 
 If `fallbackUrl` differs from `url` and `loadRemote` throws, the shell re-inits with the fallback URL and retries.
 

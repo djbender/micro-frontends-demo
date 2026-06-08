@@ -31,7 +31,7 @@
 <div class="widget">
   <div class="header">
     <h2 class="title">Trends</h2>
-    <span class="badge">v{import.meta.env.VITE_WIDGET_VERSION}</span>
+    <span class="badge">widget-trends: {import.meta.env.VITE_WIDGET_VERSION}</span>
   </div>
   <div class="chart-wrap">
     <TrendsChart {data} />

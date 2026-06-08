@@ -12,7 +12,7 @@ export const TOPICS = {
  *   fallbackUrl?: string,
  *   metadata: { integrity: string, version: string },
  *   deployment: { default: boolean, traffic: number },
- *   extras: { module: string, slot: string, route: string, requiredPermissions: string[] }
+ *   extras: { module: string, slots: { slot: string, variant?: string }[], route: string, requiredPermissions: string[] }
  * }} ManifestEntry
  * @typedef {{ schema: string, microFrontends: Record<string, ManifestEntry[]> }} Manifest
  */
@@ -38,8 +38,12 @@ export function validateManifest(json) {
         return { valid: false, error: `Entry in "${name}" missing metadata.integrity` };
       if (!entry.metadata.version || typeof entry.metadata.version !== 'string')
         return { valid: false, error: `Entry in "${name}" missing metadata.version` };
-      if (!entry.extras?.slot)
-        return { valid: false, error: `Entry in "${name}" missing extras.slot` };
+      if (!Array.isArray(entry.extras?.slots) || entry.extras.slots.length === 0)
+        return { valid: false, error: `Entry in "${name}" missing extras.slots array` };
+      for (const placement of entry.extras.slots) {
+        if (!placement || typeof placement.slot !== 'string')
+          return { valid: false, error: `Entry in "${name}" extras.slots[].slot must be a string` };
+      }
       if (!entry.extras?.route)
         return { valid: false, error: `Entry in "${name}" missing extras.route` };
       if (!Array.isArray(entry.extras?.requiredPermissions))

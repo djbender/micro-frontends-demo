@@ -8,7 +8,7 @@ const validEntry = {
   deployment: { default: true, traffic: 100 },
   extras: {
     module: './mount',
-    slot: 'main',
+    slots: [{ slot: 'main' }],
     route: '/overview',
     requiredPermissions: ['dashboard.view'],
   },
@@ -91,10 +91,22 @@ describe('validateManifest', () => {
       expect(result).toEqual({ valid: false, error: 'Entry in "widget-kpi" missing metadata.version' });
     });
 
-    it('returns invalid when extras.slot is missing', () => {
-      const entry = { ...validEntry, extras: { ...validEntry.extras, slot: undefined } };
+    it('returns invalid when extras.slots is missing', () => {
+      const entry = { ...validEntry, extras: { ...validEntry.extras, slots: undefined } };
       const result = validateManifest({ ...validManifest, microFrontends: { 'widget-kpi': [entry] } });
-      expect(result).toEqual({ valid: false, error: 'Entry in "widget-kpi" missing extras.slot' });
+      expect(result).toEqual({ valid: false, error: 'Entry in "widget-kpi" missing extras.slots array' });
+    });
+
+    it('returns invalid when extras.slots is an empty array', () => {
+      const entry = { ...validEntry, extras: { ...validEntry.extras, slots: [] } };
+      const result = validateManifest({ ...validManifest, microFrontends: { 'widget-kpi': [entry] } });
+      expect(result).toEqual({ valid: false, error: 'Entry in "widget-kpi" missing extras.slots array' });
+    });
+
+    it('returns invalid when an extras.slots entry is missing slot', () => {
+      const entry = { ...validEntry, extras: { ...validEntry.extras, slots: [{ variant: 'mini' }] } };
+      const result = validateManifest({ ...validManifest, microFrontends: { 'widget-kpi': [entry] } });
+      expect(result).toEqual({ valid: false, error: 'Entry in "widget-kpi" extras.slots[].slot must be a string' });
     });
 
     it('returns invalid when extras.route is missing', () => {

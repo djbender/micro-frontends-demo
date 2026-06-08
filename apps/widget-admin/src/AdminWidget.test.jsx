@@ -39,6 +39,6 @@ describe('AdminWidget', () => {
 
   it('renders version badge with injected version', () => {
     render(<AdminWidget />);
-    expect(screen.getByText('vtest')).toBeInTheDocument();
+    expect(screen.getByText('widget-admin: test')).toBeInTheDocument();
   });
 });

@@ -12,8 +12,8 @@ import { loadRemote } from '@module-federation/runtime';
 
 const SCHEMA = 'https://raw.githubusercontent.com/awslabs/frontend-discovery/main/schema/v1-pre.json';
 
-function makeEntry(url, { module: mod = './mount', slot, route, requiredPermissions, version = '1.0.0' } = {}) {
-  return { url, metadata: { integrity: '', version }, deployment: { default: true, traffic: 100 }, extras: { module: mod, slot, route, requiredPermissions } };
+function makeEntry(url, { module: mod = './mount', slot, slots, route, requiredPermissions, version = '1.0.0' } = {}) {
+  return { url, metadata: { integrity: '', version }, deployment: { default: true, traffic: 100 }, extras: { module: mod, slots: slots ?? [{ slot }], route, requiredPermissions } };
 }
 
 const BASE_MANIFEST = {
@@ -172,7 +172,7 @@ describe('Shell', () => {
           fallbackUrl,
           metadata: { integrity: '', version: '1.0.0' },
           deployment: { default: true, traffic: 100 },
-          extras: { module: './mount', slot: 'main', route: '/overview', requiredPermissions: ['dashboard.view'] },
+          extras: { module: './mount', slots: [{ slot: 'main' }], route: '/overview', requiredPermissions: ['dashboard.view'] },
         }],
       },
     };
@@ -240,7 +240,7 @@ describe('Shell', () => {
       schema: SCHEMA,
       microFrontends: {
         'widget-kpi': [
-          { url: v2Url, fallbackUrl: v2Url, metadata: { integrity: '', version: '1.1.0' }, deployment: { default: false, traffic: 10 }, extras: { module: './mount', slot: 'main', route: '/overview', requiredPermissions: ['dashboard.view'] } },
+          { url: v2Url, fallbackUrl: v2Url, metadata: { integrity: '', version: '1.1.0' }, deployment: { default: false, traffic: 10 }, extras: { module: './mount', slots: [{ slot: 'main' }], route: '/overview', requiredPermissions: ['dashboard.view'] } },
         ],
       },
     };
@@ -248,7 +248,7 @@ describe('Shell', () => {
       schema: SCHEMA,
       microFrontends: {
         'widget-kpi': [
-          { url: v1Url, fallbackUrl: v1Url, metadata: { integrity: '', version: '1.0.0' }, deployment: { default: true, traffic: 90 }, extras: { module: './mount', slot: 'main', route: '/overview', requiredPermissions: ['dashboard.view'] } }],
+          { url: v1Url, fallbackUrl: v1Url, metadata: { integrity: '', version: '1.0.0' }, deployment: { default: true, traffic: 90 }, extras: { module: './mount', slots: [{ slot: 'main' }], route: '/overview', requiredPermissions: ['dashboard.view'] } }],
       },
     };
     const { init: mockInit } = await import('@module-federation/runtime');
@@ -266,6 +266,31 @@ describe('Shell', () => {
     screen.getByText('Overview');
     expect(mockInit.mock.calls.some(([cfg]) => cfg.remotes?.some(r => r.entry === v1Url))).toBe(true);
     unmount2();
+  });
+
+  it('mounts a single remote into every placement but loads it once', async () => {
+    const dualManifest = {
+      schema: SCHEMA,
+      microFrontends: {
+        'widget-filter': [makeEntry('http://localhost:5004/remoteEntry.js', {
+          slots: [{ slot: 'toolbar', variant: 'full' }, { slot: 'side', variant: 'mini' }],
+          route: '/overview',
+          requiredPermissions: ['dashboard.view'],
+        })],
+      },
+    };
+    mockFetch(dualManifest);
+    const mountFn = vi.fn().mockReturnValue(vi.fn());
+    loadRemote.mockResolvedValue({ mount: mountFn });
+
+    await act(async () => { render(<Shell currentUser={{ permissions: ['dashboard.view'] }} />); });
+    screen.getByText('Overview');
+
+    // loaded once, mounted twice (one per placement) with the right variant
+    expect(loadRemote.mock.calls.filter(([name]) => name.startsWith('widget-filter'))).toHaveLength(1);
+    expect(mountFn).toHaveBeenCalledTimes(2);
+    const variants = mountFn.mock.calls.map(([, props]) => props.variant);
+    expect(variants).toEqual(['full', 'mini']);
   });
 
   it('skips a widget whose slot does not exist in the DOM (!slot continue)', async () => {

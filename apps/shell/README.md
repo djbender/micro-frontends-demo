@@ -48,7 +48,7 @@ The resolved traffic bucket is read from the `X-Traffic-Bucket` response header 
 
 Hardcoded values worth noting: the dev/preview port `5000` and the absolute asset base `http://localhost:5000/` (both in `vite.config.js`). `react` and `react-dom` are configured as Module Federation singletons.
 
-`public/discovery.local.json` is the local manifest read by the Consumer API (not by the shell directly) — it defines each widget's versions, traffic split, slot, route, and required permissions.
+`public/discovery.local.json` is the local manifest read by the Consumer API (not by the shell directly) — it defines each widget's versions, traffic split, slots (`extras.slots`, a `{ slot, variant? }` array — a widget may name more than one to mount in multiple places), route, and required permissions.
 
 ## Tests
 

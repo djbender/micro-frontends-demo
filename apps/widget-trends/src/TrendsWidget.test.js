@@ -77,7 +77,7 @@ describe('TrendsWidget', () => {
   it('renders version badge with injected version', () => {
     const bus = makeBus();
     render(TrendsWidget, { props: { bus } });
-    expect(screen.getByText('vtest')).toBeInTheDocument();
+    expect(screen.getByText('widget-trends: test')).toBeInTheDocument();
   });
 
   it('removes FILTER_CHANGE listener on destroy', () => {

@@ -62,7 +62,7 @@ ESM only (`"type": "module"`); no TypeScript (plain JS + JSDoc). Tests run under
 
 ## Tests
 
-`src/AdminWidget.test.jsx` (7 cases) covers: heading renders, all 3 user rows visible, role column values, active/inactive status counts, `dashboard.admin` permission note, no crash when rendered without props, and version badge renders `vtest`.
+`src/AdminWidget.test.jsx` (7 cases) covers: heading renders, all 3 user rows visible, role column values, active/inactive status counts, `dashboard.admin` permission note, no crash when rendered without props, and version badge renders `widget-admin: test`.
 
 `src/test/mount.contract.test.jsx` (4 cases) covers the universal mount contract: `mount` returns a function, content appends to target, `unmount()` clears rendered content, and bus events dispatched after unmount do not throw.
 

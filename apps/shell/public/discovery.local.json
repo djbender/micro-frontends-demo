@@ -1,26 +1,6 @@
 {
   "schema": "https://raw.githubusercontent.com/awslabs/frontend-discovery/main/schema/v1-pre.json",
   "microFrontends": {
-    "widget-filter": [
-      {
-        "url": "http://localhost:5004/remoteEntry.js",
-        "fallbackUrl": "http://localhost:5004/remoteEntry.js",
-        "metadata": {
-          "integrity": "",
-          "version": "1.0.0"
-        },
-        "deployment": {
-          "default": true,
-          "traffic": 100
-        },
-        "extras": {
-          "module": "./mount",
-          "slot": "toolbar",
-          "route": "/overview",
-          "requiredPermissions": ["dashboard.view"]
-        }
-      }
-    ],
     "widget-kpi": [
       {
         "url": "http://localhost:5001/remoteEntry.js",
@@ -35,7 +15,7 @@
         },
         "extras": {
           "module": "./mount",
-          "slot": "main",
+          "slots": [{ "slot": "main" }],
           "route": "/overview",
           "requiredPermissions": ["dashboard.view"]
         }
@@ -53,7 +33,7 @@
         },
         "extras": {
           "module": "./mount",
-          "slot": "main",
+          "slots": [{ "slot": "main" }],
           "route": "/overview",
           "requiredPermissions": ["dashboard.view"]
         }
@@ -73,7 +53,30 @@
         },
         "extras": {
           "module": "./mount",
-          "slot": "side",
+          "slots": [{ "slot": "side" }],
+          "route": "/overview",
+          "requiredPermissions": ["dashboard.view"]
+        }
+      }
+    ],
+    "widget-filter": [
+      {
+        "url": "http://localhost:5004/remoteEntry.js",
+        "fallbackUrl": "http://localhost:5004/remoteEntry.js",
+        "metadata": {
+          "integrity": "",
+          "version": "1.0.0"
+        },
+        "deployment": {
+          "default": true,
+          "traffic": 100
+        },
+        "extras": {
+          "module": "./mount",
+          "slots": [
+            { "slot": "toolbar", "variant": "full" },
+            { "slot": "side", "variant": "mini" }
+          ],
           "route": "/overview",
           "requiredPermissions": ["dashboard.view"]
         }
@@ -93,7 +96,7 @@
         },
         "extras": {
           "module": "./mount",
-          "slot": "main",
+          "slots": [{ "slot": "main" }],
           "route": "/admin",
           "requiredPermissions": ["dashboard.admin"]
         }

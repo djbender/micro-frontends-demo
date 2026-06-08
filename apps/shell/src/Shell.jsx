@@ -37,12 +37,13 @@ export default function Shell({ currentUser = DEFAULT_USER, userToken = null }) 
 
         const allowed = Object.entries(manifest.microFrontends).flatMap(([name, versions]) => {
           const entry = versions[0];
-          const { slot, route, requiredPermissions, module: mod } = entry.extras;
+          const { slots, route, requiredPermissions, module: mod } = entry.extras;
           if (!requiredPermissions.every(p => currentUser.permissions.includes(p))) return [];
           const version = entry.metadata.version;
           const remoteName = `${name}_${version.replace(/\./g, '_')}`;
+          const placements = slots.map(s => ({ slot: s.slot, variant: s.variant ?? 'full' }));
 
-          return [{ name, remoteName, url: entry.url, fallbackUrl: entry.fallbackUrl, module: mod, slot, route, version }];
+          return [{ name, remoteName, url: entry.url, fallbackUrl: entry.fallbackUrl, module: mod, placements, route, version }];
         });
         await init({
           name: 'shell',
@@ -91,12 +92,16 @@ export default function Shell({ currentUser = DEFAULT_USER, userToken = null }) 
         }
         /* c8 ignore next */
         if (renderAbortRef.current !== abort) return;
-        const slot = document.querySelector(`[data-slot="${mfe.slot}"]`);
-        if (!slot) continue;
-        const wrapper = document.createElement('div');
-        slot.appendChild(wrapper);
-        const unmount = mod.mount(wrapper, { bus });
-        unmountsRef.current.push(() => { unmount?.(); wrapper.remove(); });
+        // One remote, mounted once per placement — the module is loaded a single
+        // time above, so module-scope state in the widget is shared across slots.
+        for (const placement of mfe.placements) {
+          const slot = document.querySelector(`[data-slot="${placement.slot}"]`);
+          if (!slot) continue;
+          const wrapper = document.createElement('div');
+          slot.appendChild(wrapper);
+          const unmount = mod.mount(wrapper, { bus, variant: placement.variant });
+          unmountsRef.current.push(() => { unmount?.(); wrapper.remove(); });
+        }
       } catch (e) {
         console.error(`Failed to load ${mfe.name}:`, e);
       }

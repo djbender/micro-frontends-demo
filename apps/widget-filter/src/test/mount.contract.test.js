@@ -1,5 +1,10 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { mount } from '../mount.js';
+import { __resetStore } from '../store.js';
+
+beforeEach(() => {
+  __resetStore();
+});
 
 describe('widget-filter mount contract', () => {
   it('returns a function', () => {

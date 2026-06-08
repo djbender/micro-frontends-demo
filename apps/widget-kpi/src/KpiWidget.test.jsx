@@ -84,7 +84,7 @@ describe('KpiWidget', () => {
   it('renders version badge with injected version', () => {
     const bus = makeBus();
     render(<KpiWidget bus={bus} />);
-    expect(screen.getByText('vtest')).toBeInTheDocument();
+    expect(screen.getByText('widget-kpi: test')).toBeInTheDocument();
   });
 
   it('removes FILTER_CHANGE listener on unmount', () => {
