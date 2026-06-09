@@ -1,0 +1,126 @@
+# Runtime-composed micro-frontend dashboard under Docker Compose (dev mode).
+#
+# The browser (on the host) loads the shell from localhost:5000, then fetches
+# each widget's remoteEntry.js from absolute http://localhost:50XX URLs baked
+# into apps/shell/public/discovery.local.json. Because every container port is
+# published 1:1 to the host, those URLs keep working unchanged — no manifest
+# rewrite, no CORS change, no source edits. The only in-container requirement is
+# that vite listens on 0.0.0.0 (supplied via `--host` on each command line) so
+# the published ports actually reach it. fds-api already binds 0.0.0.0.
+#
+# Topologies (compose profiles):
+#   docker compose up --build                       -> 7 per-service containers (default)
+#   docker compose --profile all-in-one up --build  -> 1 container running all 7 via concurrently
+#
+# Source is bind-mounted for live HMR. node_modules lives in a per-service named
+# volume (linux binaries) that shadows the host's darwin node_modules. Each
+# service installs deps at startup into its own volume.
+
+# Shared image + bind mount. Each service overrides `command` and adds its own
+# node_modules volume.
+x-app: &app
+  build: .
+  image: micro-frontends-demo-dev
+  init: true
+  working_dir: /app
+  # Startup installs run 7-at-once; a container can occasionally die with SIGBUS
+  # (exit 135) under that memory/disk pressure. Auto-retry so the stack converges
+  # without manual intervention.
+  restart: on-failure
+
+services:
+  shell:
+    <<: *app
+    ports: ["5000:5000"]
+    volumes:
+      - ./:/app
+      - shell_nm:/app/node_modules
+    command: sh -c "pnpm install --filter shell... && pnpm --filter shell dev --host"
+
+  widget-kpi-v1-0-0:
+    <<: *app
+    ports: ["5001:5001"]
+    volumes:
+      - ./:/app
+      - kpi_v1_0_0_nm:/app/node_modules
+    command: sh -c "pnpm install --filter widget-kpi... && pnpm --filter widget-kpi dev --config vite.config.v1-0-0.js --host"
+
+  widget-kpi-v1-1-0:
+    <<: *app
+    ports: ["5002:5002"]
+    volumes:
+      - ./:/app
+      - kpi_v1_1_0_nm:/app/node_modules
+    command: sh -c "pnpm install --filter widget-kpi... && pnpm --filter widget-kpi dev --config vite.config.v1-1-0.js --host"
+
+  widget-trends:
+    <<: *app
+    ports: ["5003:5003"]
+    volumes:
+      - ./:/app
+      - trends_nm:/app/node_modules
+    command: sh -c "pnpm install --filter widget-trends... && pnpm --filter widget-trends dev --host"
+
+  widget-filter:
+    <<: *app
+    ports: ["5004:5004"]
+    volumes:
+      - ./:/app
+      - filter_nm:/app/node_modules
+    command: sh -c "pnpm install --filter widget-filter... && pnpm --filter widget-filter dev --host"
+
+  widget-admin:
+    <<: *app
+    ports: ["5005:5005"]
+    volumes:
+      - ./:/app
+      - admin_nm:/app/node_modules
+    command: sh -c "pnpm install --filter widget-admin... && pnpm --filter widget-admin dev --host"
+
+  fds-api:
+    <<: *app
+    ports: ["5006:5006"]
+    volumes:
+      - ./:/app
+      - fds_api_nm:/app/node_modules
+    # node:http binds 0.0.0.0 already; no --host needed. cwd is apps/fds-api via
+    # the filter, so the default cwd-relative manifest path resolves correctly.
+    command: sh -c "pnpm install --filter fds-api... && pnpm --filter fds-api dev"
+
+  # All-in-one: one container runs all 7 dev servers. We run the commands inline
+  # (not bin/dev) so `--host` is applied to the vite servers without editing
+  # source. concurrently is a root devDependency, available after `pnpm install`.
+  all-in-one:
+    <<: *app
+    profiles: [all-in-one]
+    ports:
+      - "5000:5000"
+      - "5001:5001"
+      - "5002:5002"
+      - "5003:5003"
+      - "5004:5004"
+      - "5005:5005"
+      - "5006:5006"
+    volumes:
+      - ./:/app
+      - aio_nm:/app/node_modules
+    command: >
+      sh -c "pnpm install &&
+      pnpm exec concurrently --kill-others-on-fail
+      'pnpm --filter shell dev --host'
+      'pnpm --filter widget-kpi dev --config vite.config.v1-0-0.js --host'
+      'pnpm --filter widget-kpi dev --config vite.config.v1-1-0.js --host'
+      'pnpm --filter widget-trends dev --host'
+      'pnpm --filter widget-filter dev --host'
+      'pnpm --filter widget-admin dev --host'
+      'pnpm --filter fds-api dev'"
+
+volumes:
+  shell_nm:
+  kpi_v1_0_0_nm:
+  kpi_v1_1_0_nm:
+  trends_nm:
+  filter_nm:
+  admin_nm:
+  fds_api_nm:
+  aio_nm:

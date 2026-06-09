@@ -57,6 +57,28 @@ This starts all six apps in parallel:
 
 Open http://localhost:5000 in your browser.
 
+### With Docker Compose
+
+Run the same dev setup in containers (live HMR, source bind-mounted) — no local
+Node/pnpm needed:
+
+```bash
+# Per-service: one container per app (default, 7 containers)
+docker compose up --build
+
+# All-in-one: a single container running all 7 dev servers
+docker compose --profile all-in-one up --build all-in-one
+```
+
+Both publish ports 5000–5006 to the host, so the browser hits the same
+`http://localhost:50XX` URLs as `pnpm dev`. Editing source on the host triggers
+HMR in the running containers. Stop with `docker compose down` (add `-v` to also
+drop the per-service `node_modules` volumes).
+
+> Note: the all-in-one invocation must name the `all-in-one` service. Running
+> `docker compose --profile all-in-one up` alone would also start the 7
+> per-service containers and clash on the published ports.
+
 ## What to look at
 
 ### `/overview` — the main demo
