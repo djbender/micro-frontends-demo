@@ -6,12 +6,11 @@ RUN npm install -g pnpm@11.5.2
 
 WORKDIR /app
 
-# Confine pnpm to a single flat /app/node_modules so one named volume per
-# service shadows it (the default symlinked linker writes a node_modules into
-# every apps/* and packages/* dir, which would leak onto the bind-mounted host
-# tree). Workspace packages like @demo/contracts are still symlinked to the
-# bind-mounted source, which is fine — they have no build step.
-ENV NPM_CONFIG_NODE_LINKER=hoisted
+# Keep pnpm's content-addressable store on the node_modules volume, not on the
+# bind-mounted /app (pnpm otherwise drops a .pnpm-store/ into the host repo on
+# every install). pnpm honors the PNPM_CONFIG_<setting> env convention
+# (NOT npm_config_/PNPM_STORE_DIR).
+ENV PNPM_CONFIG_STORE_DIR=/app/node_modules/.pnpm-store
 
 # Dev image: source arrives at runtime via bind mount, so there is no COPY.
 # Each service overrides `command` in docker-compose.yml.

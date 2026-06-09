@@ -35,6 +35,10 @@ services:
     volumes:
       - ./:/app
       - shell_nm:/app/node_modules
+      # Shadow per-package node_modules so the host's (darwin) copies don't leak
+      # through the bind mount over the container's linux install.
+      - /app/apps/shell/node_modules
+      - /app/packages/contracts/node_modules
     command: sh -c "pnpm install --filter shell... && pnpm --filter shell dev --host"
 
   widget-kpi-v1-0-0:
@@ -43,6 +47,8 @@ services:
     volumes:
       - ./:/app
       - kpi_v1_0_0_nm:/app/node_modules
+      - /app/apps/widget-kpi/node_modules
+      - /app/packages/contracts/node_modules
     command: sh -c "pnpm install --filter widget-kpi... && pnpm --filter widget-kpi dev --config vite.config.v1-0-0.js --host"
 
   widget-kpi-v1-1-0:
@@ -51,6 +57,8 @@ services:
     volumes:
       - ./:/app
       - kpi_v1_1_0_nm:/app/node_modules
+      - /app/apps/widget-kpi/node_modules
+      - /app/packages/contracts/node_modules
     command: sh -c "pnpm install --filter widget-kpi... && pnpm --filter widget-kpi dev --config vite.config.v1-1-0.js --host"
 
   widget-trends:
@@ -59,6 +67,8 @@ services:
     volumes:
       - ./:/app
       - trends_nm:/app/node_modules
+      - /app/apps/widget-trends/node_modules
+      - /app/packages/contracts/node_modules
     command: sh -c "pnpm install --filter widget-trends... && pnpm --filter widget-trends dev --host"
 
   widget-filter:
@@ -67,6 +77,8 @@ services:
     volumes:
       - ./:/app
       - filter_nm:/app/node_modules
+      - /app/apps/widget-filter/node_modules
+      - /app/packages/contracts/node_modules
     command: sh -c "pnpm install --filter widget-filter... && pnpm --filter widget-filter dev --host"
 
   widget-admin:
@@ -75,6 +87,8 @@ services:
     volumes:
       - ./:/app
       - admin_nm:/app/node_modules
+      - /app/apps/widget-admin/node_modules
+      - /app/packages/contracts/node_modules
     command: sh -c "pnpm install --filter widget-admin... && pnpm --filter widget-admin dev --host"
 
   fds-api:
@@ -83,6 +97,8 @@ services:
     volumes:
       - ./:/app
       - fds_api_nm:/app/node_modules
+      - /app/apps/fds-api/node_modules
+      - /app/packages/contracts/node_modules
     # node:http binds 0.0.0.0 already; no --host needed. cwd is apps/fds-api via
     # the filter, so the default cwd-relative manifest path resolves correctly.
     command: sh -c "pnpm install --filter fds-api... && pnpm --filter fds-api dev"
@@ -104,6 +120,14 @@ services:
     volumes:
       - ./:/app
       - aio_nm:/app/node_modules
+      # Runs every app, so shadow all per-package node_modules.
+      - /app/apps/shell/node_modules
+      - /app/apps/widget-kpi/node_modules
+      - /app/apps/widget-trends/node_modules
+      - /app/apps/widget-filter/node_modules
+      - /app/apps/widget-admin/node_modules
+      - /app/apps/fds-api/node_modules
+      - /app/packages/contracts/node_modules
     command: >
       sh -c "pnpm install &&
       pnpm exec concurrently --kill-others-on-fail
