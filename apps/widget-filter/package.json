@@ -15,7 +15,7 @@
   "devDependencies": {
     "@module-federation/vite": "^1.16",
     "@testing-library/jest-dom": "^6.9.1",
-    "happy-dom": "^20.10.2",
+    "happy-dom": "^20.10.5",
     "vite": "^8",
     "vitest": "^4.1.8"
   }
