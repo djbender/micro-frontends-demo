@@ -6,6 +6,7 @@ settings:
 
 overrides:
   ws: 8.20.1
+  undici: 7.28.0
 
 importers:
 
@@ -1199,8 +1200,8 @@ packages:
   undici-types@8.3.0:
     resolution: {integrity: sha512-j375ScV60dom+YkPFIfTLcOiPxkN/buHz5GobjLhixFuANaNs3C9l4GmrWqejgXWJ7BbJcFYpTEUkS1Ge8bpZQ==}
 
-  undici@7.24.7:
-    resolution: {integrity: sha512-H/nlJ/h0ggGC+uRL3ovD+G0i4bqhvsDOpbDv7At5eFLlj2b41L8QliGbnl2H7SnDiYhENphh1tQFJZf+MyfLsQ==}
+  undici@7.28.0:
+    resolution: {integrity: sha512-cRZYrTDwWznlnRiPjggAGxZXanty6M8RV1ff8Wm4LWXBp7/IG8v5DnOm74DtUBp9OONpK75YlPnIjQqX0dBDtA==}
     engines: {node: '>=20.18.1'}
 
   vite@8.0.16:
@@ -1412,7 +1413,7 @@ snapshots:
       isomorphic-ws: 5.0.0(ws@8.20.1)
       node-schedule: 2.1.1
       typescript: 5.9.3
-      undici: 7.24.7
+      undici: 7.28.0
       ws: 8.20.1
     transitivePeerDependencies:
       - bufferutil
@@ -2191,7 +2192,7 @@ snapshots:
 
   undici-types@8.3.0: {}
 
-  undici@7.24.7: {}
+  undici@7.28.0: {}
 
   vite@8.0.16(@types/node@26.0.0):
     dependencies:
