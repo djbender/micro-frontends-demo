@@ -54,7 +54,7 @@ importers:
         version: 19.2.7(react@19.2.7)
     devDependencies:
       '@module-federation/vite':
-        specifier: ^1.16.12
+        specifier: ^1.16
         version: 1.16.12(typescript@5.9.3)(vite@8.1.0(@types/node@26.0.0))
       '@testing-library/jest-dom':
         specifier: ^6.9.1
@@ -88,7 +88,7 @@ importers:
         version: 19.2.7(react@19.2.7)
     devDependencies:
       '@module-federation/vite':
-        specifier: ^1.16.12
+        specifier: ^1.16
         version: 1.16.12(typescript@5.9.3)(vite@8.1.0(@types/node@26.0.0))
       '@testing-library/jest-dom':
         specifier: ^6.9.1
@@ -116,7 +116,7 @@ importers:
         version: link:../../packages/contracts
     devDependencies:
       '@module-federation/vite':
-        specifier: ^1.16.12
+        specifier: ^1.16
         version: 1.16.12(typescript@5.9.3)(vite@8.1.0(@types/node@26.0.0))
       '@testing-library/jest-dom':
         specifier: ^6.9.1
@@ -144,7 +144,7 @@ importers:
         version: 19.2.7(react@19.2.7)
     devDependencies:
       '@module-federation/vite':
-        specifier: ^1.16.12
+        specifier: ^1.16
         version: 1.16.12(typescript@5.9.3)(vite@8.1.0(@types/node@26.0.0))
       '@testing-library/jest-dom':
         specifier: ^6.9.1
@@ -175,7 +175,7 @@ importers:
         version: 5.56.4
     devDependencies:
       '@module-federation/vite':
-        specifier: ^1.16.12
+        specifier: ^1.16
         version: 1.16.12(typescript@5.9.3)(vite@8.1.0(@types/node@26.0.0))
       '@sveltejs/vite-plugin-svelte':
         specifier: ^7
