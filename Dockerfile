@@ -1,4 +1,4 @@
-FROM node:26.4.0-slim
+FROM node:26.5.0-slim
 
 # pnpm pinned to the repo's packageManager version. Node 26 no longer bundles
 # corepack, so install via npm.
