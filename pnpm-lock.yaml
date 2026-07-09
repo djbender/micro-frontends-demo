@@ -44,8 +44,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/contracts
       '@module-federation/runtime':
-        specifier: ^2.6.0
-        version: 2.6.0
+        specifier: ^2.7.0
+        version: 2.7.0
       react:
         specifier: ^19
         version: 19.2.7
@@ -273,14 +273,23 @@ packages:
   '@module-federation/error-codes@2.6.0':
     resolution: {integrity: sha512-J9opjWJJZ1JI/9EvNZF8Ps1VMHS9EsH/i0UjCkQQxFVYZxSDBX1CFunvc7awac4cY//LqJUfqBbfoQPhCfKKKw==}
 
+  '@module-federation/error-codes@2.7.0':
+    resolution: {integrity: sha512-syToF3H77IbBhJ7auGMCIb5ZDmJ5tvaqSeEvncJrOCq7JBT96F4UDlQDyNh6kCVznvYqqHsPeEMrfI9b5/Omlg==}
+
   '@module-federation/managers@2.6.0':
     resolution: {integrity: sha512-7Y4Ri6Lh10dCHoEJvNGFmK2Gg1JKy7oJ1TEZhuU3n3mgIpZ519fDNRvU4+tiO9C49p1xyK+mQ8ewxth83waKUA==}
 
   '@module-federation/runtime-core@2.6.0':
     resolution: {integrity: sha512-9sL7Yj3H3COZI9JpK/J4hmJUBkIJdmowkj6phHuFiy5Hm5bHiE5U+9WBbR9KqTdyNhAVSL9FeprBW5/Io6i59A==}
 
+  '@module-federation/runtime-core@2.7.0':
+    resolution: {integrity: sha512-5ROZLVIeV9YnWO2RwCwSHcy6sh48yclErO/2GZ2Xe8lFubPrFirgU8pbwBjZw+All0ZzN44BGS4ECRMVFzVcpg==}
+
   '@module-federation/runtime@2.6.0':
     resolution: {integrity: sha512-Y8KgL70RDxD8cCtGWGlGkt+TSDleIjdGmS27gnllibQAIgG/vHhPD11r8kd92x44k4dqtMIntzreOphGICl92g==}
+
+  '@module-federation/runtime@2.7.0':
+    resolution: {integrity: sha512-UtLozKKNvhT0D1+F0MEWsAmddJ39ItKW15E22LVMAwXmYZRSnzIvJQ2Y6kQ4LwhWABsw/GRSpUDex5OfhpSQPw==}
 
   '@module-federation/sdk@2.6.0':
     resolution: {integrity: sha512-Z3HT1uDciMrvz2at3sw6TJbAK9Fl7RmoC/8iqO35HDtQMQJ1qSsMIAjnsiCpAC0D4nAm6PIqgSqPWRO/WYgo0Q==}
@@ -289,6 +298,9 @@ packages:
     peerDependenciesMeta:
       node-fetch:
         optional: true
+
+  '@module-federation/sdk@2.7.0':
+    resolution: {integrity: sha512-piiLEjaIdjbNq8E11Di6vsfryhcdN/+sBCH6NjG7gSU2VHHoHEayZQWWL7VVdS6rVjexF9McLhPTSrl0adUU+A==}
 
   '@module-federation/third-party-dts-extractor@2.6.0':
     resolution: {integrity: sha512-rEC1YRC3gTafoOcFm1Htz6cAwHRoWEMQNCm1LXR1HiuayJzUkViVpK/1Pp37UZfytOyQ0qIaP6Ag81PdGvDbmw==}
@@ -1426,6 +1438,8 @@ snapshots:
 
   '@module-federation/error-codes@2.6.0': {}
 
+  '@module-federation/error-codes@2.7.0': {}
+
   '@module-federation/managers@2.6.0':
     dependencies:
       '@module-federation/sdk': 2.6.0
@@ -1440,6 +1454,11 @@ snapshots:
     transitivePeerDependencies:
       - node-fetch
 
+  '@module-federation/runtime-core@2.7.0':
+    dependencies:
+      '@module-federation/error-codes': 2.7.0
+      '@module-federation/sdk': 2.7.0
+
   '@module-federation/runtime@2.6.0':
     dependencies:
       '@module-federation/error-codes': 2.6.0
@@ -1448,7 +1467,15 @@ snapshots:
     transitivePeerDependencies:
       - node-fetch
 
+  '@module-federation/runtime@2.7.0':
+    dependencies:
+      '@module-federation/error-codes': 2.7.0
+      '@module-federation/runtime-core': 2.7.0
+      '@module-federation/sdk': 2.7.0
+
   '@module-federation/sdk@2.6.0': {}
+
+  '@module-federation/sdk@2.7.0': {}
 
   '@module-federation/third-party-dts-extractor@2.6.0':
     dependencies:
