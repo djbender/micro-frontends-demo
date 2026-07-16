@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@demo/contracts": "workspace:*",
-    "@module-federation/runtime": "^2.7.0",
+    "@module-federation/runtime": "^2.8.0",
     "react": "^19",
     "react-dom": "^19"
   },
