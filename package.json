@@ -23,7 +23,7 @@
   "devDependencies": {
     "@playwright/test": "^1.62.0",
     "@vitest/coverage-v8": "^4.1.10",
-    "concurrently": "^10.0.3",
+    "concurrently": "^10.0.5",
     "oxlint": "^1.75.0",
     "vitest": "^4.1.10"
   }
