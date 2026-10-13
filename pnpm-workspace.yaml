@@ -1,7 +1,3 @@
 packages:
   - "apps/*"
   - "packages/*"
-
-overrides:
-  ws: 8.20.1
-  undici: 7.28.0
