@@ -24,7 +24,7 @@
     "@playwright/test": "^1.63.0",
     "@vitest/coverage-v8": "^4.1.10",
     "concurrently": "^10.0.5",
-    "oxlint": "^1.79.0",
+    "oxlint": "^1.87.0",
     "vitest": "^4.1.11"
   }
 }
