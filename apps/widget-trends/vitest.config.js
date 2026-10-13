@@ -11,5 +11,10 @@ export default defineConfig({
     environment: 'happy-dom',
     globals: true,
     setupFiles: ['./src/test/setup.js'],
+    // Vitest 5 externalizes node_modules by default; svelte-core ships a raw
+    // .svelte file that must go through the Svelte plugin.
+    server: {
+      deps: { inline: [/@testing-library\/svelte/] },
+    },
   },
 });
