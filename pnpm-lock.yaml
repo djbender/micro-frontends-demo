@@ -22,7 +22,7 @@ importers:
         version: 1.87.0
       vitest:
         specifier: ^5.0.4
-        version: 5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.3(vitest@5.0.4))(happy-dom@21.0.1)(vite@8.3.4(@types/node@26.6.5))
+        version: 5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.3(vitest@5.0.4))(happy-dom@21.0.3)(vite@8.3.4(@types/node@26.6.5))
 
   apps/fds-api:
     dependencies:
@@ -32,7 +32,7 @@ importers:
     devDependencies:
       vitest:
         specifier: ^5.0.4
-        version: 5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.3(vitest@5.0.4))(happy-dom@21.0.1)(vite@8.3.4(@types/node@26.6.5))
+        version: 5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.3(vitest@5.0.4))(happy-dom@21.0.3)(vite@8.3.4(@types/node@26.6.5))
 
   apps/shell:
     dependencies:
@@ -54,7 +54,7 @@ importers:
         version: 1.23.4(typescript@5.9.3)(vite@8.3.4(@types/node@26.6.5))
       '@testing-library/jest-dom':
         specifier: ^7.0.1
-        version: 7.0.1(@testing-library/dom@10.4.1)(vitest@5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.3)(happy-dom@21.0.1)(vite@8.3.4(@types/node@26.6.5)))
+        version: 7.0.1(@testing-library/dom@10.4.1)(vitest@5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.3)(happy-dom@21.0.3)(vite@8.3.4(@types/node@26.6.5)))
       '@testing-library/react':
         specifier: ^16.3.2
         version: 16.3.2(@testing-library/dom@10.4.1)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -62,14 +62,14 @@ importers:
         specifier: ^6
         version: 6.1.2(vite@8.3.4(@types/node@26.6.5))
       happy-dom:
-        specifier: ^21.0.1
-        version: 21.0.1
+        specifier: ^21.0.3
+        version: 21.0.3
       vite:
         specifier: ^8
         version: 8.3.4(@types/node@26.6.5)
       vitest:
         specifier: ^5.0.4
-        version: 5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.3(vitest@5.0.4))(happy-dom@21.0.1)(vite@8.3.4(@types/node@26.6.5))
+        version: 5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.3(vitest@5.0.4))(happy-dom@21.0.3)(vite@8.3.4(@types/node@26.6.5))
 
   apps/widget-admin:
     dependencies:
@@ -88,7 +88,7 @@ importers:
         version: 1.23.4(typescript@5.9.3)(vite@8.3.4(@types/node@26.6.5))
       '@testing-library/jest-dom':
         specifier: ^7.0.1
-        version: 7.0.1(@testing-library/dom@10.4.1)(vitest@5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.3)(happy-dom@21.0.1)(vite@8.3.4(@types/node@26.6.5)))
+        version: 7.0.1(@testing-library/dom@10.4.1)(vitest@5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.3)(happy-dom@21.0.3)(vite@8.3.4(@types/node@26.6.5)))
       '@testing-library/react':
         specifier: ^16.3.2
         version: 16.3.2(@testing-library/dom@10.4.1)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -96,14 +96,14 @@ importers:
         specifier: ^6
         version: 6.1.2(vite@8.3.4(@types/node@26.6.5))
       happy-dom:
-        specifier: ^21.0.1
-        version: 21.0.1
+        specifier: ^21.0.3
+        version: 21.0.3
       vite:
         specifier: ^8
         version: 8.3.4(@types/node@26.6.5)
       vitest:
         specifier: ^5.0.4
-        version: 5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.3(vitest@5.0.4))(happy-dom@21.0.1)(vite@8.3.4(@types/node@26.6.5))
+        version: 5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.3(vitest@5.0.4))(happy-dom@21.0.3)(vite@8.3.4(@types/node@26.6.5))
 
   apps/widget-filter:
     dependencies:
@@ -116,16 +116,16 @@ importers:
         version: 1.23.4(typescript@5.9.3)(vite@8.3.4(@types/node@26.6.5))
       '@testing-library/jest-dom':
         specifier: ^7.0.1
-        version: 7.0.1(@testing-library/dom@10.4.1)(vitest@5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.3)(happy-dom@21.0.1)(vite@8.3.4(@types/node@26.6.5)))
+        version: 7.0.1(@testing-library/dom@10.4.1)(vitest@5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.3)(happy-dom@21.0.3)(vite@8.3.4(@types/node@26.6.5)))
       happy-dom:
-        specifier: ^21.0.1
-        version: 21.0.1
+        specifier: ^21.0.3
+        version: 21.0.3
       vite:
         specifier: ^8
         version: 8.3.4(@types/node@26.6.5)
       vitest:
         specifier: ^5.0.4
-        version: 5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.3(vitest@5.0.4))(happy-dom@21.0.1)(vite@8.3.4(@types/node@26.6.5))
+        version: 5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.3(vitest@5.0.4))(happy-dom@21.0.3)(vite@8.3.4(@types/node@26.6.5))
 
   apps/widget-kpi:
     dependencies:
@@ -144,7 +144,7 @@ importers:
         version: 1.23.4(typescript@5.9.3)(vite@8.3.4(@types/node@26.6.5))
       '@testing-library/jest-dom':
         specifier: ^7.0.1
-        version: 7.0.1(@testing-library/dom@10.4.1)(vitest@5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.3)(happy-dom@21.0.1)(vite@8.3.4(@types/node@26.6.5)))
+        version: 7.0.1(@testing-library/dom@10.4.1)(vitest@5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.3)(happy-dom@21.0.3)(vite@8.3.4(@types/node@26.6.5)))
       '@testing-library/react':
         specifier: ^16.3.2
         version: 16.3.2(@testing-library/dom@10.4.1)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -152,14 +152,14 @@ importers:
         specifier: ^6
         version: 6.1.2(vite@8.3.4(@types/node@26.6.5))
       happy-dom:
-        specifier: ^21.0.1
-        version: 21.0.1
+        specifier: ^21.0.3
+        version: 21.0.3
       vite:
         specifier: ^8
         version: 8.3.4(@types/node@26.6.5)
       vitest:
         specifier: ^5.0.4
-        version: 5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.3(vitest@5.0.4))(happy-dom@21.0.1)(vite@8.3.4(@types/node@26.6.5))
+        version: 5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.3(vitest@5.0.4))(happy-dom@21.0.3)(vite@8.3.4(@types/node@26.6.5))
 
   apps/widget-trends:
     dependencies:
@@ -178,25 +178,25 @@ importers:
         version: 7.3.1(svelte@5.57.2)(vite@8.3.4(@types/node@26.6.5))
       '@testing-library/jest-dom':
         specifier: ^7.0.1
-        version: 7.0.1(@testing-library/dom@10.4.1)(vitest@5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.3)(happy-dom@21.0.1)(vite@8.3.4(@types/node@26.6.5)))
+        version: 7.0.1(@testing-library/dom@10.4.1)(vitest@5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.3)(happy-dom@21.0.3)(vite@8.3.4(@types/node@26.6.5)))
       '@testing-library/svelte':
         specifier: ^5.4.2
-        version: 5.4.2(svelte@5.57.2)(vite@8.3.4(@types/node@26.6.5))(vitest@5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.3)(happy-dom@21.0.1)(vite@8.3.4(@types/node@26.6.5)))
+        version: 5.4.2(svelte@5.57.2)(vite@8.3.4(@types/node@26.6.5))(vitest@5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.3)(happy-dom@21.0.3)(vite@8.3.4(@types/node@26.6.5)))
       happy-dom:
-        specifier: ^21.0.1
-        version: 21.0.1
+        specifier: ^21.0.3
+        version: 21.0.3
       vite:
         specifier: ^8
         version: 8.3.4(@types/node@26.6.5)
       vitest:
         specifier: ^5.0.4
-        version: 5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.3(vitest@5.0.4))(happy-dom@21.0.1)(vite@8.3.4(@types/node@26.6.5))
+        version: 5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.3(vitest@5.0.4))(happy-dom@21.0.3)(vite@8.3.4(@types/node@26.6.5))
 
   packages/contracts:
     devDependencies:
       vitest:
         specifier: ^5.0.4
-        version: 5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.3(vitest@5.0.4))(happy-dom@21.0.1)(vite@8.3.4(@types/node@26.6.5))
+        version: 5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.3(vitest@5.0.4))(happy-dom@21.0.3)(vite@8.3.4(@types/node@26.6.5))
 
 packages:
 
@@ -800,8 +800,8 @@ packages:
     resolution: {integrity: sha512-XjH1AECxf0giL2V1aU8vKyRR2ppRUb5c0EvT7zuJTokQ74bNo52zOtghqdWIqrhUD79fo3x0WfKZdOqxF6LG1Q==}
     engines: {node: '>=18'}
 
-  happy-dom@21.0.1:
-    resolution: {integrity: sha512-pRBs/u9fhrncyByOl58DMex0R2uAj6ZPKWIjV5j5yNGZBqLw3P6BTRhlc0DD5b/Ht4/6JYTMuE2LJhUWRC6SGw==}
+  happy-dom@21.0.3:
+    resolution: {integrity: sha512-PesNgu5BnIEmAwzKGewB3K1ORFeznFZJ4JrRz89ea1wkHnxskdpzX9sN/+zb4KO6k8oSMhyJSj/cwXAFrYBBNA==}
     engines: {node: '>=20.0.0'}
 
   indent-string@4.0.0:
@@ -1447,7 +1447,7 @@ snapshots:
       picocolors: 1.1.1
       pretty-format: 27.5.1
 
-  '@testing-library/jest-dom@7.0.1(@testing-library/dom@10.4.1)(vitest@5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.3)(happy-dom@21.0.1)(vite@8.3.4(@types/node@26.6.5)))':
+  '@testing-library/jest-dom@7.0.1(@testing-library/dom@10.4.1)(vitest@5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.3)(happy-dom@21.0.3)(vite@8.3.4(@types/node@26.6.5)))':
     dependencies:
       '@adobe/css-tools': 4.5.0
       '@testing-library/dom': 10.4.1
@@ -1457,7 +1457,7 @@ snapshots:
       picocolors: 1.1.1
       redent: 3.0.0
     optionalDependencies:
-      vitest: 5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.3(vitest@5.0.4))(happy-dom@21.0.1)(vite@8.3.4(@types/node@26.6.5))
+      vitest: 5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.3(vitest@5.0.4))(happy-dom@21.0.3)(vite@8.3.4(@types/node@26.6.5))
 
   '@testing-library/react@16.3.2(@testing-library/dom@10.4.1)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
     dependencies:
@@ -1470,14 +1470,14 @@ snapshots:
     dependencies:
       svelte: 5.57.2
 
-  '@testing-library/svelte@5.4.2(svelte@5.57.2)(vite@8.3.4(@types/node@26.6.5))(vitest@5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.3)(happy-dom@21.0.1)(vite@8.3.4(@types/node@26.6.5)))':
+  '@testing-library/svelte@5.4.2(svelte@5.57.2)(vite@8.3.4(@types/node@26.6.5))(vitest@5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.3)(happy-dom@21.0.3)(vite@8.3.4(@types/node@26.6.5)))':
     dependencies:
       '@testing-library/dom': 10.4.1
       '@testing-library/svelte-core': 1.1.3(svelte@5.57.2)
       svelte: 5.57.2
     optionalDependencies:
       vite: 8.3.4(@types/node@26.6.5)
-      vitest: 5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.3(vitest@5.0.4))(happy-dom@21.0.1)(vite@8.3.4(@types/node@26.6.5))
+      vitest: 5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.3(vitest@5.0.4))(happy-dom@21.0.3)(vite@8.3.4(@types/node@26.6.5))
 
   '@types/aria-query@5.0.4': {}
 
@@ -1515,7 +1515,7 @@ snapshots:
       obug: 2.2.1
       std-env: 4.3.0
       tinyrainbow: 3.2.0
-      vitest: 5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.3(vitest@5.0.4))(happy-dom@21.0.1)(vite@8.3.4(@types/node@26.6.5))
+      vitest: 5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.3(vitest@5.0.4))(happy-dom@21.0.3)(vite@8.3.4(@types/node@26.6.5))
 
   '@vitest/istanbul-lib-coverage@1.0.2': {}
 
@@ -1634,7 +1634,7 @@ snapshots:
 
   get-east-asian-width@1.7.0: {}
 
-  happy-dom@21.0.1:
+  happy-dom@21.0.3:
     dependencies:
       '@types/node': 26.6.5
       '@types/whatwg-mimetype': 3.0.2
@@ -1899,7 +1899,7 @@ snapshots:
     optionalDependencies:
       vite: 8.3.4(@types/node@26.6.5)
 
-  vitest@5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.3(vitest@5.0.4))(happy-dom@21.0.1)(vite@8.3.4(@types/node@26.6.5)):
+  vitest@5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.3(vitest@5.0.4))(happy-dom@21.0.3)(vite@8.3.4(@types/node@26.6.5)):
     dependencies:
       '@types/chai': 5.2.3
       '@vitest/mocker': 5.0.4(vite@8.3.4(@types/node@26.6.5))
@@ -1918,7 +1918,7 @@ snapshots:
     optionalDependencies:
       '@types/node': 26.6.5
       '@vitest/coverage-v8': 5.0.3(vitest@5.0.4)
-      happy-dom: 21.0.1
+      happy-dom: 21.0.3
     transitivePeerDependencies:
       - msw
 
