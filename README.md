@@ -4,7 +4,7 @@ A runtime-composed micro-frontend dashboard demonstrating eight micro-frontend p
 
 1. **Runtime Composition via Discovery Manifest** — the shell fetches a JSON manifest at boot and resolves every widget URL at runtime. Nothing is bundled together at build time; swapping a widget's URL in the manifest redeploys it without touching the shell or any other widget.
 
-2. **Universal Mount Contract** — every widget exposes one Module Federation module (`./mount`) with the same signature: `mount(target, props) → unmount`. The shell calls this single function and never knows whether the widget underneath is React, Svelte, or a Web Component. Teams choose their own stack; adding a new framework requires zero changes to the shell.
+2. **Universal Mount Contract** — every widget exposes one Module Federation module (`./mount`) with the same signature: `mount(target, props) → unmount`. The shell calls this single function and never knows whether the widget underneath is React, Svelte, Angular, or a Web Component. Teams choose their own stack; adding a new framework requires zero changes to the shell.
 
 3. **Event Bus for Cross-Framework Communication** — the shell creates one `EventTarget` and injects it into every widget at mount. Widgets communicate via Custom Events (`dashboard:filter-change`, `dashboard:request-filter`) with no global store, no shared package, and no coupling between implementations.
 
@@ -89,6 +89,7 @@ The shell calls the Consumer API at boot to resolve widget versions, filters by 
 - Filter widget (toolbar): Shadow DOM Web Component. Change the date range or segment.
 - KPI widget (main area): React. Responds to the filter — watch the numbers update.
 - Trends chart (sidebar): Svelte 5. Responds to the same filter — watch the chart redraw. This is cross-framework communication.
+- Alerts table (main area, below KPIs): Angular 22. Responds to the same filter by narrowing its rows, and has its own severity/search controls and sortable columns that stay local to the widget.
 - Version badges: each widget shows its own `package.json` version (e.g. `v1.0.0`), not the shell's.
 - Theme toggle (🌙 button): flips `data-theme` on `<html>`. All widgets — including the Shadow DOM filter — recolor via CSS custom properties.
 - Bucket chip (header): shows your current traffic bucket resolved by the Consumer API.
