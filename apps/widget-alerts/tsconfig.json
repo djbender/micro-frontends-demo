@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ES2022",
+    "moduleResolution": "bundler",
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false,
+    "skipLibCheck": true,
+    "strict": false,
+    "allowJs": true,
+    "types": ["vite/client"]
+  },
+  "angularCompilerOptions": {
+    "strictTemplates": true
+  },
+  "files": ["src/mount.js"],
+  "include": ["src/**/*.ts"]
+}

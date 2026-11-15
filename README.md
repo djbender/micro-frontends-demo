@@ -43,7 +43,7 @@ pnpm install
 pnpm dev
 ```
 
-This starts all six apps in parallel:
+This starts all seven apps in parallel:
 
 | App | URL | Framework |
 |---|---|---|
@@ -53,6 +53,7 @@ This starts all six apps in parallel:
 | widget-trends | http://localhost:5003 | Svelte 5 |
 | widget-filter | http://localhost:5004 | Web Component |
 | widget-admin | http://localhost:5005 | React 19 |
+| widget-alerts | http://localhost:5007 | Angular 22 |
 | fds-api (Consumer API) | http://localhost:5006 | Node.js http |
 
 Open http://localhost:5000 in your browser.
@@ -66,11 +67,11 @@ Node/pnpm needed:
 # Per-service: one container per app (default, 7 containers)
 docker compose up --build
 
-# All-in-one: a single container running all 7 dev servers
+# All-in-one: a single container running all 8 dev servers
 docker compose --profile all-in-one up --build all-in-one
 ```
 
-Both publish ports 5000–5006 to the host, so the browser hits the same
+Both publish ports 5000–5007 to the host, so the browser hits the same
 `http://localhost:50XX` URLs as `pnpm dev`. Editing source on the host triggers
 HMR in the running containers. Stop with `docker compose down` (add `-v` to also
 drop the per-service `node_modules` volumes).
@@ -153,6 +154,7 @@ apps/
   widget-kpi/             ← React, :5001 — consumes filter events
   widget-trends/          ← Svelte 5, :5003 — consumes filter events
   widget-admin/           ← React, :5005 — gated by dashboard.admin permission
+  widget-alerts/          ← Angular 22, :5007 — consumes filter events
 ```
 
 Every widget exposes one Module Federation module (`./mount`) with the contract `mount(target, props) → unmount`. `props.bus` is the `EventTarget` injected by the shell.

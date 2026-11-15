@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-# Start all 6 dev servers in parallel (ports 5000–5006)
+# Start all 7 dev apps in parallel (ports 5000–5007)
 pnpm dev
 
 # Build all apps sequentially
@@ -21,7 +21,7 @@ pnpm --filter widget-trends dev
 pnpm --filter fds-api dev
 ```
 
-No linter or test suite is configured. There is no TypeScript — the codebase is plain JS + JSDoc throughout.
+No linter or test suite is configured. There is no TypeScript — the codebase is plain JS + JSDoc throughout, with one exception: `widget-alerts` (Angular) is written in TypeScript because Angular's compiler requires decorators. TS stays confined to that app; its `mount.js` entry and `data.js` are still plain JS.
 
 ## Architecture
 
@@ -50,6 +50,7 @@ Every widget exposes `./mount` with the same signature: `mount(target, props) �
 | `widget-trends` | Svelte 5 | 5003 | `svelteMount(Component, { target, props })` |
 | `widget-filter` | Web Component | 5004 | `customElements.define` guard + `el.bus = props.bus` |
 | `widget-admin` | React 19 | 5005 | `createRoot(target).render(...)` (does not use `props.bus`) |
+| `widget-alerts` | Angular 22 | 5007 | `createApplication()` + `createComponent(..., { hostElement: target })`; `props.bus` is provided via a `BUS` injection token |
 | `fds-api` | Node.js http | 5006 | Consumer API (reads manifest, resolves versions) |
 
 ### Cross-widget communication
@@ -58,7 +59,7 @@ Via `EventTarget` bus — no global store, no shared package. Three events defin
 
 - `dashboard:filter-change` — emitted by `widget-filter` with `{ dateRange, segment }` detail
 - `dashboard:request-filter` — emitted by consumers on mount; `widget-filter` re-emits current state in response (late-mount handshake, no state cached on the bus)
-- `dashboard:event-consumed` — dispatched by each consumer (`widget-kpi`, `widget-trends`) after handling `filter-change`; detail shape `{ actor: string, topic: string }`. The shell renders a live **EventLog** panel as another bus consumer, making the one-emit → N-consumers fan-out visible in real time.
+- `dashboard:event-consumed` — dispatched by each consumer (`widget-kpi`, `widget-trends`, `widget-alerts`) after handling `filter-change`; detail shape `{ actor: string, topic: string }`. The shell renders a live **EventLog** panel as another bus consumer, making the one-emit → N-consumers fan-out visible in real time.
 
 Widgets MAY import `TOPICS` from `@demo/contracts` or use string literals.
 
@@ -110,7 +111,7 @@ CSS custom properties on `:root` in `apps/shell/src/styles.css`. Dark mode via `
 
 ### Shared dependencies
 
-`react` + `react-dom` are `singleton: true` in shell, widget-kpi, and widget-admin only. `widget-trends` (Svelte) and `widget-filter` (Web Component) must NOT list react in their `shared` config.
+`react` + `react-dom` are `singleton: true` in shell, widget-kpi, and widget-admin only. `widget-trends` (Svelte), `widget-filter` (Web Component) and `widget-alerts` (Angular) must NOT list react in their `shared` config.
 
 ### Version badges
 
