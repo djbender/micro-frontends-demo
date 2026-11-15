@@ -91,6 +91,16 @@ services:
       - /app/packages/contracts/node_modules
     command: sh -c "pnpm install --filter widget-admin... && pnpm --filter widget-admin dev --host"
 
+  widget-alerts:
+    <<: *app
+    ports: ["5007:5007"]
+    volumes:
+      - ./:/app
+      - alerts_nm:/app/node_modules
+      - /app/apps/widget-alerts/node_modules
+      - /app/packages/contracts/node_modules
+    command: sh -c "pnpm install --filter widget-alerts... && pnpm --filter widget-alerts dev --host"
+
   fds-api:
     <<: *app
     ports: ["5006:5006"]
@@ -103,7 +113,7 @@ services:
     # the filter, so the default cwd-relative manifest path resolves correctly.
     command: sh -c "pnpm install --filter fds-api... && pnpm --filter fds-api dev"
 
-  # All-in-one: one container runs all 7 dev servers. We run the commands inline
+  # All-in-one: one container runs all 8 dev servers. We run the commands inline
   # (not bin/dev) so `--host` is applied to the vite servers without editing
   # source. concurrently is a root devDependency, available after `pnpm install`.
   all-in-one:
@@ -117,6 +127,7 @@ services:
       - "5004:5004"
       - "5005:5005"
       - "5006:5006"
+      - "5007:5007"
     volumes:
       - ./:/app
       - aio_nm:/app/node_modules
@@ -126,6 +137,7 @@ services:
       - /app/apps/widget-trends/node_modules
       - /app/apps/widget-filter/node_modules
       - /app/apps/widget-admin/node_modules
+      - /app/apps/widget-alerts/node_modules
       - /app/apps/fds-api/node_modules
       - /app/packages/contracts/node_modules
     command: >
@@ -137,6 +149,7 @@ services:
       'pnpm --filter widget-trends dev --host'
       'pnpm --filter widget-filter dev --host'
       'pnpm --filter widget-admin dev --host'
+      'pnpm --filter widget-alerts dev --host'
       'pnpm --filter fds-api dev'"
 
 volumes:
@@ -146,5 +159,6 @@ volumes:
   trends_nm:
   filter_nm:
   admin_nm:
+  alerts_nm:
   fds_api_nm:
   aio_nm:

@@ -4,7 +4,7 @@ A runtime-composed micro-frontend dashboard demonstrating eight micro-frontend p
 
 1. **Runtime Composition via Discovery Manifest** — the shell fetches a JSON manifest at boot and resolves every widget URL at runtime. Nothing is bundled together at build time; swapping a widget's URL in the manifest redeploys it without touching the shell or any other widget.
 
-2. **Universal Mount Contract** — every widget exposes one Module Federation module (`./mount`) with the same signature: `mount(target, props) → unmount`. The shell calls this single function and never knows whether the widget underneath is React, Svelte, or a Web Component. Teams choose their own stack; adding a new framework requires zero changes to the shell.
+2. **Universal Mount Contract** — every widget exposes one Module Federation module (`./mount`) with the same signature: `mount(target, props) → unmount`. The shell calls this single function and never knows whether the widget underneath is React, Svelte, Angular, or a Web Component. Teams choose their own stack; adding a new framework requires zero changes to the shell.
 
 3. **Event Bus for Cross-Framework Communication** — the shell creates one `EventTarget` and injects it into every widget at mount. Widgets communicate via Custom Events (`dashboard:filter-change`, `dashboard:request-filter`) with no global store, no shared package, and no coupling between implementations.
 
@@ -43,7 +43,7 @@ pnpm install
 pnpm dev
 ```
 
-This starts all six apps in parallel:
+This starts all seven apps in parallel:
 
 | App | URL | Framework |
 |---|---|---|
@@ -53,6 +53,7 @@ This starts all six apps in parallel:
 | widget-trends | http://localhost:5003 | Svelte 5 |
 | widget-filter | http://localhost:5004 | Web Component |
 | widget-admin | http://localhost:5005 | React 19 |
+| widget-alerts | http://localhost:5007 | Angular 22 |
 | fds-api (Consumer API) | http://localhost:5006 | Node.js http |
 
 Open http://localhost:5000 in your browser.
@@ -66,11 +67,11 @@ Node/pnpm needed:
 # Per-service: one container per app (default, 7 containers)
 docker compose up --build
 
-# All-in-one: a single container running all 7 dev servers
+# All-in-one: a single container running all 8 dev servers
 docker compose --profile all-in-one up --build all-in-one
 ```
 
-Both publish ports 5000–5006 to the host, so the browser hits the same
+Both publish ports 5000–5007 to the host, so the browser hits the same
 `http://localhost:50XX` URLs as `pnpm dev`. Editing source on the host triggers
 HMR in the running containers. Stop with `docker compose down` (add `-v` to also
 drop the per-service `node_modules` volumes).
@@ -88,6 +89,7 @@ The shell calls the Consumer API at boot to resolve widget versions, filters by 
 - Filter widget (toolbar): Shadow DOM Web Component. Change the date range or segment.
 - KPI widget (main area): React. Responds to the filter — watch the numbers update.
 - Trends chart (sidebar): Svelte 5. Responds to the same filter — watch the chart redraw. This is cross-framework communication.
+- Alerts table (main area, below KPIs): Angular 22. Responds to the same filter by narrowing its rows, and has its own severity/search controls and sortable columns that stay local to the widget.
 - Version badges: each widget shows its own `package.json` version (e.g. `v1.0.0`), not the shell's.
 - Theme toggle (🌙 button): flips `data-theme` on `<html>`. All widgets — including the Shadow DOM filter — recolor via CSS custom properties.
 - Bucket chip (header): shows your current traffic bucket resolved by the Consumer API.
@@ -153,6 +155,7 @@ apps/
   widget-kpi/             ← React, :5001 — consumes filter events
   widget-trends/          ← Svelte 5, :5003 — consumes filter events
   widget-admin/           ← React, :5005 — gated by dashboard.admin permission
+  widget-alerts/          ← Angular 22, :5007 — consumes filter events
 ```
 
 Every widget exposes one Module Federation module (`./mount`) with the contract `mount(target, props) → unmount`. `props.bus` is the `EventTarget` injected by the shell.

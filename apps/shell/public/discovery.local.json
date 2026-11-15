@@ -39,6 +39,26 @@
         }
       }
     ],
+    "widget-alerts": [
+      {
+        "url": "http://localhost:5007/remoteEntry.js",
+        "fallbackUrl": "http://localhost:5007/remoteEntry.js",
+        "metadata": {
+          "integrity": "",
+          "version": "1.0.0"
+        },
+        "deployment": {
+          "default": true,
+          "traffic": 100
+        },
+        "extras": {
+          "module": "./mount",
+          "slots": [{ "slot": "main" }],
+          "route": "/overview",
+          "requiredPermissions": ["dashboard.view"]
+        }
+      }
+    ],
     "widget-trends": [
       {
         "url": "http://localhost:5003/remoteEntry.js",

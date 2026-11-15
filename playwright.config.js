@@ -15,6 +15,7 @@ export default defineConfig({
     { command: 'pnpm --filter widget-trends run preview', url: 'http://localhost:5003', reuseExistingServer: true },
     { command: 'pnpm --filter widget-filter run preview', url: 'http://localhost:5004', reuseExistingServer: true },
     { command: 'pnpm --filter widget-admin run preview', url: 'http://localhost:5005', reuseExistingServer: true },
+    { command: 'pnpm --filter widget-alerts run preview', url: 'http://localhost:5007', reuseExistingServer: true },
   ],
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },

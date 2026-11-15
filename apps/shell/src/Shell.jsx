@@ -173,7 +173,7 @@ export default function Shell({ currentUser = DEFAULT_USER, userToken = null }) 
               Every widget — regardless of framework — exposes one Module Federation module{' '}
               <code>./mount</code> with the same signature:{' '}
               <code>mount(target, props) → unmount</code>. The shell calls this single function
-              and never knows whether the widget underneath is React, Svelte, or a Web Component.{' '}
+              and never knows whether the widget underneath is React, Svelte, Angular, or a Web Component.{' '}
               <em>Teams choose their own stack; adding a new framework requires zero changes to the shell.</em>
             </p>
           </li>
@@ -185,7 +185,7 @@ export default function Shell({ currentUser = DEFAULT_USER, userToken = null }) 
               mount. Widgets communicate via Custom Events (<code>dashboard:filter-change</code>,{' '}
               <code>dashboard:request-filter</code>) — no global store, no shared package, no
               coupling between implementations.{' '}
-              <em>A React widget and a Svelte widget react to the same filter with no shared runtime dependency.</em>
+              <em>React, Svelte and Angular widgets react to the same filter with no shared runtime dependency.</em>
             </p>
           </li>
 
