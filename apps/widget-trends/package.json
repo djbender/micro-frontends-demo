@@ -14,7 +14,7 @@
     "svelte": "^5"
   },
   "devDependencies": {
-    "@module-federation/vite": "^1.23",
+    "@module-federation/vite": "^1.24",
     "@sveltejs/vite-plugin-svelte": "^7",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/svelte": "^5.4.2",
