@@ -45,16 +45,16 @@ pnpm dev
 
 This starts all seven apps in parallel:
 
-| App | URL | Framework |
-|---|---|---|
-| Shell | http://localhost:5000 | React 19 |
-| widget-kpi v1.0.0 | http://localhost:5001 | React 19 |
-| widget-kpi v1.1.0 | http://localhost:5002 | React 19 (canary) |
-| widget-trends | http://localhost:5003 | Svelte 5 |
-| widget-filter | http://localhost:5004 | Web Component |
-| widget-admin | http://localhost:5005 | React 19 |
-| widget-alerts | http://localhost:5007 | Angular 22 |
-| fds-api (Consumer API) | http://localhost:5006 | Node.js http |
+| App                    | URL                   | Framework         |
+|------------------------|-----------------------|-------------------|
+| Shell                  | http://localhost:5000 | React 19          |
+| widget-kpi v1.0.0      | http://localhost:5001 | React 19          |
+| widget-kpi v1.1.0      | http://localhost:5002 | React 19 (canary) |
+| widget-trends          | http://localhost:5003 | Svelte 5          |
+| widget-filter          | http://localhost:5004 | Web Component     |
+| widget-admin           | http://localhost:5005 | React 19          |
+| fds-api (Consumer API) | http://localhost:5006 | Node.js http      |
+| widget-alerts          | http://localhost:5007 | Angular 22        |
 
 Open http://localhost:5000 in your browser.
 
@@ -150,11 +150,11 @@ packages/
   contracts/              ← @demo/contracts: TOPICS + validateManifest() + djb2() + selectVersion()
 apps/
   shell/                  ← React host, :5000 — calls Consumer API, gates, init, renders slots
-  fds-api/                ← Consumer API, :5006 — resolves versions, returns single-entry manifest
-  widget-filter/          ← Web Component, :5004 — emits filter events
   widget-kpi/             ← React, :5001 — consumes filter events
   widget-trends/          ← Svelte 5, :5003 — consumes filter events
+  widget-filter/          ← Web Component, :5004 — emits filter events
   widget-admin/           ← React, :5005 — gated by dashboard.admin permission
+  fds-api/                ← Consumer API, :5006 — resolves versions, returns single-entry manifest
   widget-alerts/          ← Angular 22, :5007 — consumes filter events
 ```
 
