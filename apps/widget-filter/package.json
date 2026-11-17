@@ -13,7 +13,7 @@
     "@demo/contracts": "workspace:*"
   },
   "devDependencies": {
-    "@module-federation/vite": "^1.23",
+    "@module-federation/vite": "^1.24",
     "@testing-library/jest-dom": "^7.0.1",
     "happy-dom": "^21.0.4",
     "vite": "^8",

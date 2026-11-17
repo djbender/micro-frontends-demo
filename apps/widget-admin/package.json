@@ -15,7 +15,7 @@
     "react-dom": "^19"
   },
   "devDependencies": {
-    "@module-federation/vite": "^1.23",
+    "@module-federation/vite": "^1.24",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@vitejs/plugin-react": "^6",
